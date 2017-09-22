@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/MeshTest/Chunk.unity
+  isLoaded: 1
+  isActive: 1
