@@ -5,21 +5,25 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Chunk3 : MonoBehaviour
+public class Chunk : MonoBehaviour
 {
     private List<Vector3> _vertices = new List<Vector3>();
     private List<int> _triangles = new List<int>();
+    private List<Vector2> _uvs = new List<Vector2>();
+
+    public float _textureOffset = 1 / 16f;
 
     private Mesh _mesh;
 
-    private int[,,] _map;
-    public int length;
-    public int width;
-    public int height;
+    private Block[,,] _map;
+    public int length = 10;
+    public int width = 10;
+    public int height = 10;
 
-	void Start () {
-       CalculateMap();
-	}
+    void Start()
+    {
+        CalculateMap();
+    }
 
     /// <summary>
     /// 预处理地形的函数
@@ -30,14 +34,14 @@ public class Chunk3 : MonoBehaviour
         _mesh = new Mesh();
         _mesh.name = "Chunck";
 
-        _map = new int[length, height, width];
+        _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 for (int z = 0; z < width; z++)
                 {
-                    _map[x, y, z] = 1;
+                    _map[x, y, z] = BlockMap.GetBlock("Dirt");
                 }
             }
         }
@@ -52,7 +56,7 @@ public class Chunk3 : MonoBehaviour
             {
                 for (int z = 0; z < width; z++)
                 {
-                    if (_map[x, y, z] != 0)
+                    if (_map[x, y, z] != null)
                     {
                         AddCube(x, y, z);
                     }
@@ -62,6 +66,7 @@ public class Chunk3 : MonoBehaviour
 
         _mesh.vertices = _vertices.ToArray();
         _mesh.triangles = _triangles.ToArray();
+        _mesh.uv = _uvs.ToArray();
 
         _mesh.RecalculateBounds();
         _mesh.RecalculateNormals();
@@ -69,7 +74,7 @@ public class Chunk3 : MonoBehaviour
         GetComponent<MeshFilter>().mesh = _mesh;
     }
 
-    #region 组织立方体顶点
+    #region 创建立方体
     private void AddCube(int x, int y, int z)
     {
         if (IsBlockTransparent(x, y, z - 1))
@@ -99,6 +104,12 @@ public class Chunk3 : MonoBehaviour
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, -0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
     }
 
     private void AddCubeBack(int x, int y, int z)
@@ -114,6 +125,12 @@ public class Chunk3 : MonoBehaviour
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, 0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, 0.5f + z));
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
     }
 
     private void AddCubeLeft(int x, int y, int z)
@@ -129,6 +146,12 @@ public class Chunk3 : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr));
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr));
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr * _textureOffset + _textureOffset));
     }
 
     private void AddCubeRight(int x, int y, int z)
@@ -144,6 +167,12 @@ public class Chunk3 : MonoBehaviour
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, 0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr));
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr));
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr * _textureOffset + _textureOffset));
     }
 
     private void AddCubeTop(int x, int y, int z)
@@ -159,6 +188,12 @@ public class Chunk3 : MonoBehaviour
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, 0.5f + z));
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
     }
 
     private void AddCubeBottom(int x, int y, int z)
@@ -174,6 +209,12 @@ public class Chunk3 : MonoBehaviour
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, 0.5f + z));
         _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, 0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
     }
     #endregion
 
@@ -187,6 +228,9 @@ public class Chunk3 : MonoBehaviour
     public bool IsBlockTransparent(int x, int y, int z)
     {
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
+            return true;
+
+        if (_map[x, y, z] == null)
             return true;
 
         return false;
