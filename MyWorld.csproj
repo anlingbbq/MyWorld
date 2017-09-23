@@ -78,8 +78,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\MeshTest\Chunk1.cs" />
-    <Compile Include="Assets\MeshTest\Chunk2.cs" />
+    <Compile Include="Assets\Test\Chunk\Script\Chunk1.cs" />
+    <Compile Include="Assets\Test\Chunk\Script\Chunk2.cs" />
+    <Compile Include="Assets\Test\Chunk\Script\Chunk3.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

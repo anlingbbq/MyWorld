@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/MeshTest/Chunk.unity
+- path: Assets/Test/Chunk/Scene/ChunkMap.unity
   isLoaded: 1
   isActive: 1
