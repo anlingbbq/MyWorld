@@ -6,10 +6,18 @@ public class BlockMap : MonoBehaviour
 {
     private static Dictionary<string, Block> _blockDict = new Dictionary<string, Block>();
 
-    void Awake()
+    private void Awake()
     {
-        Block dirt = new Block("Dirt", 2, 15, 2, 15, 2, 15);
+        InitBlockMap();
+    }
+
+    private void InitBlockMap()
+    {
+        Block dirt = new Block("Dirt", 2, 15, 2, 15, 2, 15, 2, 15);
         _blockDict.Add(dirt.name, dirt);
+
+        Block grass = new Block("Grass", 3, 15, 0, 15, 2, 15);
+        _blockDict.Add(grass.name, grass);
     }
 
     public static Block GetBlock(string name)

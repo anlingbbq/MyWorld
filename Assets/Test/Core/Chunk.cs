@@ -41,7 +41,10 @@ public class Chunk : MonoBehaviour
             {
                 for (int z = 0; z < width; z++)
                 {
-                    _map[x, y, z] = BlockMap.GetBlock("Dirt");
+                    if (y == height - 1)
+                        _map[x, y, z] = BlockMap.GetBlock("Grass");
+                    else
+                        _map[x, y, z] = BlockMap.GetBlock("Dirt");
                 }
             }
         }
@@ -106,10 +109,10 @@ public class Chunk : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, -0.5f + z));
 
         Block block = _map[x, y, z];
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset, block.texture_v_fb * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset, block.texture_v_fb * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset, block.texture_v_fb * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset, block.texture_v_fb * _textureOffset + _textureOffset));
     }
 
     private void AddCubeBack(int x, int y, int z)
@@ -127,10 +130,10 @@ public class Chunk : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset, block.texture_v_fb * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset, block.texture_v_fb * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset, block.texture_v_fb * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset, block.texture_v_fb * _textureOffset + _textureOffset));
     }
 
     private void AddCubeLeft(int x, int y, int z)
@@ -148,10 +151,10 @@ public class Chunk : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr));
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr));
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr + _textureOffset));
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset, block.texture_v_lr * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset, block.texture_v_lr * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset, block.texture_v_lr * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset, block.texture_v_lr * _textureOffset + _textureOffset));
     }
 
     private void AddCubeRight(int x, int y, int z)
@@ -169,10 +172,10 @@ public class Chunk : MonoBehaviour
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr));
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr));
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset + _textureOffset, block.texture_y_lr + _textureOffset));
-        _uvs.Add(new Vector2(block.texture_x_lr * _textureOffset, block.texture_y_lr * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset, block.texture_v_lr * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset, block.texture_v_lr * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset, block.texture_v_lr * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset, block.texture_v_lr * _textureOffset + _textureOffset));
     }
 
     private void AddCubeTop(int x, int y, int z)
@@ -190,10 +193,10 @@ public class Chunk : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset, block.texture_v_top * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset + _textureOffset, block.texture_v_top * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset + _textureOffset, block.texture_v_top * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset, block.texture_v_top * _textureOffset + _textureOffset));
     }
 
     private void AddCubeBottom(int x, int y, int z)
@@ -211,10 +214,10 @@ public class Chunk : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset + _textureOffset, block.texture_y + _textureOffset));
-        _uvs.Add(new Vector2(block.texture_x * _textureOffset, block.texture_y * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset, block.texture_v_bottom * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset + _textureOffset, block.texture_v_bottom * _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset + _textureOffset, block.texture_v_bottom * _textureOffset + _textureOffset));
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset, block.texture_v_bottom * _textureOffset + _textureOffset));
     }
     #endregion
 
