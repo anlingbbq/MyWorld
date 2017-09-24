@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Test/Chunk/Scene/ChunkTexture.unity
+- path: Assets/Test/Ctrl/Player.unity
   isLoaded: 1
   isActive: 1
