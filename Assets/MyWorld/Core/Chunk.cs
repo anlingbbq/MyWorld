@@ -23,21 +23,39 @@ public class Chunk : MonoBehaviour
     public static int width = 10;
     public static int height = 5;
 
+    private static bool _working;
+    private bool _ready;
+
     void Start()
     {
-        CalculateMap();
         _chunks.Add(this);
+    }
+
+    void Update()
+    {
+        if (!_working && !_ready)
+        {
+            _ready = true;
+            InitEnvironment();
+        }
+    }
+
+    private void InitEnvironment()
+    {
+        _working = true;
+
+        _mesh = new Mesh();
+        _mesh.name = "Chunck";
+
+        StartCoroutine(CalculateMap());
     }
 
     /// <summary>
     /// 预处理地形的函数
     /// 通过不同的算法产生地形数据
     /// </summary>
-    private void CalculateMap()
+    private IEnumerator CalculateMap()
     {
-        _mesh = new Mesh();
-        _mesh.name = "Chunck";
-
         _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
         {
@@ -52,10 +70,11 @@ public class Chunk : MonoBehaviour
                 }
             }
         }
-        CalculateMesh();
+        yield return null;
+        StartCoroutine(CalculateMesh());
     }
 
-    private void CalculateMesh()
+    private IEnumerator CalculateMesh()
     {
         for (int x = 0; x < length; x++)
         {
@@ -65,6 +84,8 @@ public class Chunk : MonoBehaviour
                 {
                     if (_map[x, y, z] != null)
                     {
+                        if (y < 2)
+                            continue;
                         AddCube(x, y, z);
                     }
                 }
@@ -79,6 +100,9 @@ public class Chunk : MonoBehaviour
         _mesh.RecalculateNormals();
         GetComponent<MeshCollider>().sharedMesh = _mesh;
         GetComponent<MeshFilter>().mesh = _mesh;
+
+        _working = false;
+        yield return null;
     }
 
     #region 创建立方体
@@ -142,11 +166,11 @@ public class Chunk : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
-        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset, 
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset,
             block.texture_v_fb * _textureOffset) + new Vector2(_shrinkSize, _shrinkSize));
-        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset, 
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset,
             block.texture_v_fb * _textureOffset) + new Vector2(-_shrinkSize, _shrinkSize));
-        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset, 
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset,
             block.texture_v_fb * _textureOffset + _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
         _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset,
             block.texture_v_fb * _textureOffset + _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));

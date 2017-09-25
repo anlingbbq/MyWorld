@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChunkLoadMgr : MonoBehaviour
+public class ChunkMgr : MonoBehaviour
 {
     [Label("玩家")]
     [SerializeField]
@@ -10,7 +10,7 @@ public class ChunkLoadMgr : MonoBehaviour
     [Label("图快预制体")]
     [SerializeField]
     private GameObject _chunkPrefab;
-    [Label("加载图快的范围")]
+    [Label("加载图块的范围")]
     [SerializeField]
     private int _loadRange = 30;
 

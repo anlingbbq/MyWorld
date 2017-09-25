@@ -87,7 +87,7 @@
     <Compile Include="Assets\Test\Chunk\Script\Chunk3.cs" />
     <Compile Include="Assets\Test\Chunk\Script\Chunk4.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\CamerRotate.cs" />
-    <Compile Include="Assets\Test\Ctrl\Script\ChunkLoadMgr.cs" />
+    <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\PlayerCtrl.cs" />
     <Compile Include="Assets\ThreePart\Physics Platformer Kit\Misc\DemoTextFade.cs" />
     <Compile Include="Assets\ThreePart\Physics Platformer Kit\Scripts\CameraFollow.cs" />
