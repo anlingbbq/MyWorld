@@ -19,9 +19,9 @@ public class Chunk : MonoBehaviour
     private Mesh _mesh;
 
     private Block[,,] _map;
-    public static int length = 10;
-    public static int width = 10;
-    public static int height = 5;
+    public static int length = 20;
+    public static int width = 20;
+    public static int height = 20;
 
     private static bool _working;
     private bool _ready;
@@ -59,14 +59,21 @@ public class Chunk : MonoBehaviour
         _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
         {
+            float noiseX = (float)x / 20;
             for (int y = 0; y < height; y++)
             {
+                float noiseY = (float)y / 20;
                 for (int z = 0; z < width; z++)
                 {
-                    if (y == height - 1 && Random.Range(0, 5) == 1)
-                        _map[x, y, z] = BlockMap.GetBlock("Grass");
-                    if (y < height - 1)
+                    float noiseZ = (float)z / 20;
+                    float noiseValue = SimplexNoise.Noise.Generate(noiseX, noiseY, noiseZ);
+                    noiseValue /= (float)y / 5;
+                    if (noiseValue > 0.2f)
                         _map[x, y, z] = BlockMap.GetBlock("Dirt");
+                    //if (y == height - 1 && Random.Range(0, 5) == 1)
+                    //    _map[x, y, z] = BlockMap.GetBlock("Grass");
+                    //if (y < height - 1)
+                    //    _map[x, y, z] = BlockMap.GetBlock("Dirt");
                 }
             }
         }
@@ -84,7 +91,7 @@ public class Chunk : MonoBehaviour
                 {
                     if (_map[x, y, z] != null)
                     {
-                        if (y < 2)
+                        if (y < 4)
                             continue;
                         AddCube(x, y, z);
                     }

@@ -16,8 +16,17 @@ public class CamerRotate : MonoBehaviour
     public float mouseSpeedX = 4;
     public float mouseSpeedY = 4;
 
+    private Quaternion screenMovementSpace;
+    private Vector3 screenMovementForward, screenMovementRight;
+
     private void Update()
     {
+        screenMovementSpace = Quaternion.Euler(0, transform.eulerAngles.y, 0);
+        screenMovementForward = screenMovementSpace * Vector3.forward;
+        screenMovementRight = screenMovementSpace * Vector3.right;
+
+        float h = Input.GetAxisRaw()
+
         if (Input.GetMouseButton(1))
         {
             _mouseX += Input.GetAxis("Mouse X") * mouseSpeedX;
