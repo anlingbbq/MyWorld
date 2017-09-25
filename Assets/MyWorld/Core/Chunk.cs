@@ -13,6 +13,7 @@ public class Chunk : MonoBehaviour
     private List<int> _triangles = new List<int>();
     private List<Vector2> _uvs = new List<Vector2>();
 
+    [Label("纹理偏移")]
     public float _textureOffset = 1 / 16f;
 
     private Mesh _mesh;
@@ -20,7 +21,7 @@ public class Chunk : MonoBehaviour
     private Block[,,] _map;
     public static int length = 10;
     public static int width = 10;
-    public static int height = 10;
+    public static int height = 5;
 
     void Start()
     {
@@ -253,7 +254,8 @@ public class Chunk : MonoBehaviour
     #endregion
 
     /// <summary>
-    /// 关键的优化方法，只显示边界的面
+    /// 关键的优化方法，用于检测当前位置的面是否透明(不存在)
+    /// 透明的面返回true，则可使后面的面显示
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
