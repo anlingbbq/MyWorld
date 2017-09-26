@@ -25,7 +25,11 @@ public class CamerRotate : MonoBehaviour
         screenMovementForward = screenMovementSpace * Vector3.forward;
         screenMovementRight = screenMovementSpace * Vector3.right;
 
-        float h = Input.GetAxisRaw()
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+
+        _player.transform.position += screenMovementForward * v * Time.deltaTime * rotateSpeed;
+        _player.transform.position += screenMovementRight * h * Time.deltaTime * rotateSpeed;
 
         if (Input.GetMouseButton(1))
         {

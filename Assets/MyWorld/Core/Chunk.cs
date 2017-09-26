@@ -21,7 +21,7 @@ public class Chunk : MonoBehaviour
     private Block[,,] _map;
     public static int length = 20;
     public static int width = 20;
-    public static int height = 20;
+    public static int height = 10;
 
     private static bool _working;
     private bool _ready;
