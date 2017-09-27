@@ -56,18 +56,24 @@ public class Chunk : MonoBehaviour
     /// </summary>
     private IEnumerator CalculateMap()
     {
+        Vector3 offset = new Vector3(Random.value * 10000, Random.value * 10000, Random.value * 10000);
+
         _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
         {
-            float noiseX = (float)x / 20;
+            float noiseX = Mathf.Abs(x + transform.position.x + offset.x) / 20;
+
             for (int y = 0; y < height; y++)
             {
-                float noiseY = (float)y / 20;
+                float noiseY = Mathf.Abs(y + transform.position.x + offset.x) / 20;
+
                 for (int z = 0; z < width; z++)
                 {
-                    float noiseZ = (float)z / 20;
+                    float noiseZ = Mathf.Abs(z + transform.position.x + offset.x) / 20;
+
                     float noiseValue = SimplexNoise.Noise.Generate(noiseX, noiseY, noiseZ);
-                    noiseValue /= (float)y / 5;
+                    noiseValue += (8 - (float)y) / 5;
+                    noiseValue /= (float)y / 2;
                     if (noiseValue > 0.2f)
                         _map[x, y, z] = BlockMap.GetBlock("Dirt");
                     //if (y == height - 1 && Random.Range(0, 5) == 1)
@@ -91,8 +97,8 @@ public class Chunk : MonoBehaviour
                 {
                     if (_map[x, y, z] != null)
                     {
-                        if (y < 4)
-                            continue;
+                        //if (y < 4)
+                            //continue;
                         AddCube(x, y, z);
                     }
                 }

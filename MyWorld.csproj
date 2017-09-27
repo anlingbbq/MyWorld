@@ -91,6 +91,7 @@
     <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\PlayerCtrl.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinText.cs" />
+    <Compile Include="Assets\Test\Perlin\Scripte\PerlinTexture2D.cs" />
     <Compile Include="Assets\ThreePart\Physics Platformer Kit\Misc\DemoTextFade.cs" />
     <Compile Include="Assets\ThreePart\Physics Platformer Kit\Scripts\CameraFollow.cs" />
     <Compile Include="Assets\ThreePart\Physics Platformer Kit\Scripts\CharacterMotor.cs" />

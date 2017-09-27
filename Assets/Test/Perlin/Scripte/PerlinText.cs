@@ -4,45 +4,27 @@ using UnityEngine;
 
 public class PerlinText : MonoBehaviour
 {
-    public int pixWidth;
-    public int pixHeight;
-    public float xOrg;
-    public float yOrg;
-    public float scale = 1.0F;
-    private Texture2D noiseTex;
-    private Color[] pix;
-    private Renderer rend;
+    public int width = 4;
+    public int lenght = 128;
+    public int heightScale = 20;
+    public float detailScale = 25;
+
+    public GameObject block;
 
     void Start()
     {
-        rend = GetComponent<Renderer>();
-        noiseTex = new Texture2D(pixWidth, pixHeight);
-        pix = new Color[noiseTex.width * noiseTex.height];
-        rend.material.mainTexture = noiseTex;
-    }
-
-    void CalcNoise()
-    {
-        float y = 0.0F;
-        while (y < noiseTex.height)
+        for (int x = 0; x <= lenght; x++)
         {
-            float x = 0.0F;
-            while (x < noiseTex.width)
+            for (int z = 0; z <= width; z++)
             {
-                float xCoord = xOrg + x / noiseTex.width * scale;
-                float yCoord = yOrg + y / noiseTex.height * scale;
-                float sample = Mathf.PerlinNoise(xCoord, yCoord);
-                pix[(int)(y * noiseTex.width + x)] = new Color(sample, sample, sample);
-                x++;
+                int y = (int)(Mathf.PerlinNoise(x / detailScale, z / detailScale) * heightScale);
+                Vector3 pos = new Vector3(x, y, z);
+                Instantiate(block, pos, Quaternion.identity);
             }
-            y++;
         }
-        noiseTex.SetPixels(pix);
-        noiseTex.Apply();
     }
 
     void Update()
     {
-        CalcNoise();
     }
 }
