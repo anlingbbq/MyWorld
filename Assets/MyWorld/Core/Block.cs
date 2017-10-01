@@ -33,8 +33,8 @@
         texture_u_lr = tru;
         texture_v_lr = trv;
         texture_u_top = ttu;
-        texture_u_bottom = tbu;
         texture_v_top = ttv;
+        texture_u_bottom = tbu;
         texture_v_bottom = tbv;
     }
 
@@ -58,8 +58,8 @@
         texture_u_lr = tlu;
         texture_v_lr = tlv;
         texture_u_top = ttu;
-        texture_u_bottom = tbu;
         texture_v_top = ttv;
+        texture_u_bottom = tbu;
         texture_v_bottom = tbv;
     }
 }

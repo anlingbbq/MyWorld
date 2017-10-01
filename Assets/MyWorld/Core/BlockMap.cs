@@ -18,6 +18,12 @@ public class BlockMap : MonoBehaviour
 
         Block grass = new Block("Grass", 3, 15, 0, 15, 2, 15);
         _blockDict.Add(grass.name, grass);
+
+        Block tnt = new Block("TNT", 8, 15, 8, 15, 8, 15);
+        _blockDict.Add(tnt.name, tnt);
+
+        Block test = new Block("Test", 6, 7, 6, 7, 6, 7);
+        _blockDict.Add(test.name, test);
     }
 
     public static Block GetBlock(string name)

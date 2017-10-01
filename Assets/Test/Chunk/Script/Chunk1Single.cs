@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Chunk2 : MonoBehaviour
+public class Chunk1Single: MonoBehaviour
 {
     private List<Vector3> _vertices = new List<Vector3>();
     private List<int> _triangles = new List<int>();
@@ -46,25 +46,40 @@ public class Chunk2 : MonoBehaviour
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
 
-        _vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        _vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
+        _vertices.Add(new Vector3(1, 0, 0));
+        _vertices.Add(new Vector3(0, 0, 0));
+        _vertices.Add(new Vector3(0, 1, 0));
+        _vertices.Add(new Vector3(1, 1, 0));
     }
 
     private void AddCubeBack()
     {
-        _triangles.Add(1 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
-        _triangles.Add(3 + _vertices.Count);
-        _triangles.Add(3 + _vertices.Count);
-        _triangles.Add(0 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
 
-        _vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        _vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-        _vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        _vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
+        _vertices.Add(new Vector3(0, 0, -1));
+        _vertices.Add(new Vector3(1, 0, -1));
+        _vertices.Add(new Vector3(1, 1, -1));
+        _vertices.Add(new Vector3(0, 1, -1));
+    }
+
+    private void AddCubeRight()
+    {
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+
+        _vertices.Add(new Vector3(0, 0, 0));
+        _vertices.Add(new Vector3(0, 0, -1));
+        _vertices.Add(new Vector3(0, 1, -1));
+        _vertices.Add(new Vector3(0, 1, 0));
     }
 
     private void AddCubeLeft()
@@ -76,54 +91,39 @@ public class Chunk2 : MonoBehaviour
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
 
-        _vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
-        _vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        _vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        _vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
-    }
-
-    private void AddCubeRight()
-    {
-        _triangles.Add(1 + _vertices.Count);
-        _triangles.Add(2 + _vertices.Count);
-        _triangles.Add(3 + _vertices.Count);
-        _triangles.Add(3 + _vertices.Count);
-        _triangles.Add(0 + _vertices.Count);
-        _triangles.Add(1 + _vertices.Count);
-
-        _vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-        _vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
+        _vertices.Add(new Vector3(1, 0, -1));
+        _vertices.Add(new Vector3(1, 0, 0));
+        _vertices.Add(new Vector3(1, 1, 0));
+        _vertices.Add(new Vector3(1, 1, -1));
     }
 
     private void AddCubeTop()
     {
-        _triangles.Add(2 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
         _triangles.Add(0 + _vertices.Count);
-        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
 
-        _vertices.Add(new Vector3(-0.5f, 0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, 0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, 0.5f, 0.5f));
-        _vertices.Add(new Vector3(-0.5f, 0.5f, 0.5f));
+        _vertices.Add(new Vector3(0, 1, 0));
+        _vertices.Add(new Vector3(0, 1, -1));
+        _vertices.Add(new Vector3(1, 1, -1));
+        _vertices.Add(new Vector3(1, 1, 0));
     }
 
     private void AddCubeBottom()
     {
-        _triangles.Add(1 + _vertices.Count);
-        _triangles.Add(2 + _vertices.Count);
-        _triangles.Add(3 + _vertices.Count);
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(0 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
 
-        _vertices.Add(new Vector3(-0.5f, -0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, -0.5f, -0.5f));
-        _vertices.Add(new Vector3(0.5f, -0.5f, 0.5f));
-        _vertices.Add(new Vector3(-0.5f, -0.5f, 0.5f));
+        _vertices.Add(new Vector3(1, 0, 0));
+        _vertices.Add(new Vector3(0, 0, 0));
+        _vertices.Add(new Vector3(0, 0, -1));
+        _vertices.Add(new Vector3(1, 0, -1));
     }
 }

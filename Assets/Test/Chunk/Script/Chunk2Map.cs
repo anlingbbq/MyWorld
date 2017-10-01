@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Chunk3 : MonoBehaviour
+public class Chunk2Map : MonoBehaviour
 {
     private List<Vector3> _vertices = new List<Vector3>();
     private List<int> _triangles = new List<int>();

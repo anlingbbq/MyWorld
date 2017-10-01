@@ -19,16 +19,19 @@ public class Chunk : MonoBehaviour
     private Mesh _mesh;
 
     private Block[,,] _map;
-    public static int length = 20;
-    public static int width = 20;
-    public static int height = 10;
+    public static int length = 16;
+    public static int width = 16;
+    public static int height = 16;
 
     private static bool _working;
     private bool _ready;
 
+    public static int seed;
+
     void Start()
     {
         _chunks.Add(this);
+        _map = new Block[length, height, width];
     }
 
     void Update()
@@ -51,35 +54,41 @@ public class Chunk : MonoBehaviour
     }
 
     /// <summary>
+    /// 平原图块
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public Block GetPlainBlock(Vector3 pos)
+    {
+        Random.InitState(seed);
+        Vector3 offset = new Vector3(Random.value * 100000, Random.value * 100000, Random.value * 100000);
+        float noiseX = Mathf.Abs(pos.x + offset.x) / 20;
+        float noiseY = Mathf.Abs(pos.y + offset.x) / 20;
+        float noiseZ = Mathf.Abs(pos.z + offset.x) / 20;
+
+        float noiseValue = SimplexNoise.Noise.Generate(noiseX, noiseY, noiseZ);
+        noiseValue += (50 - pos.y) / 5;
+        noiseValue /= pos.y / 4;
+        if (noiseValue > 0.2f)
+        {
+            return BlockMap.GetBlock("Dirt");
+        }
+        return null;
+    }
+
+    /// <summary>
     /// 预处理地形的函数
     /// 通过不同的算法产生地形数据
     /// </summary>
     private IEnumerator CalculateMap()
     {
-        Vector3 offset = new Vector3(Random.value * 10000, Random.value * 10000, Random.value * 10000);
-
-        _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
         {
-            float noiseX = Mathf.Abs(x + transform.position.x + offset.x) / 20;
-
             for (int y = 0; y < height; y++)
             {
-                float noiseY = Mathf.Abs(y + transform.position.x + offset.x) / 20;
-
                 for (int z = 0; z < width; z++)
                 {
-                    float noiseZ = Mathf.Abs(z + transform.position.x + offset.x) / 20;
-
-                    float noiseValue = SimplexNoise.Noise.Generate(noiseX, noiseY, noiseZ);
-                    noiseValue += (8 - (float)y) / 5;
-                    noiseValue /= (float)y / 2;
-                    if (noiseValue > 0.2f)
-                        _map[x, y, z] = BlockMap.GetBlock("Dirt");
-                    //if (y == height - 1 && Random.Range(0, 5) == 1)
-                    //    _map[x, y, z] = BlockMap.GetBlock("Grass");
-                    //if (y < height - 1)
-                    //    _map[x, y, z] = BlockMap.GetBlock("Dirt");
+                    _map[x, y, z] = GetPlainBlock(new Vector3(x, y, z));
                 }
             }
         }
@@ -301,7 +310,13 @@ public class Chunk : MonoBehaviour
     public bool IsBlockTransparent(int x, int y, int z)
     {
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
-            return true;
+        {
+            if (GetPlainBlock(transform.position + new Vector3(x, y, z)) == null)
+                return true;
+            else
+                return false;
+        }
+            
 
         if (_map[x, y, z] == null)
             return true;

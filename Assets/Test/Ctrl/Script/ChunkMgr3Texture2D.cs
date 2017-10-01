@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChunkMgr : MonoBehaviour
+public class ChunkMgr3Texture2D : MonoBehaviour
 {
     [Label("玩家")]
     [SerializeField]
@@ -22,11 +22,12 @@ public class ChunkMgr : MonoBehaviour
             {
                 int chunkX = Mathf.FloorToInt(x / Chunk.length) * Chunk.length;
                 int chunkZ = Mathf.FloorToInt(z / Chunk.width) * Chunk.width;
-                Chunk chunk = Chunk.GetChunk(Mathf.FloorToInt(chunkX), 0, Mathf.FloorToInt(chunkZ));
-                if (chunk == null)
-                {
-                    Instantiate(_chunkPrefab, new Vector3(chunkX, 0, chunkZ), Quaternion.identity);
-                }
+
+                //Chunk3TextureCenter chunk = Chunk3TextureCenter.GetChunk(Mathf.FloorToInt(chunkX), 0, Mathf.FloorToInt(chunkZ));
+                //if (chunk == null)
+                //{
+                //    Instantiate(_chunkPrefab, new Vector3(chunkX, 0, chunkZ), Quaternion.identity);
+                //}
             }
         }
     }
