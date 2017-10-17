@@ -7,20 +7,27 @@ using UnityEngine;
 [RequireComponent(typeof(MeshCollider))]
 public class Chunk3Texture : MonoBehaviour
 {
+<<<<<<< HEAD
     private static List<Chunk3Texture> _chunks = new List<Chunk3Texture>();
 
+=======
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     private List<Vector3> _vertices = new List<Vector3>();
     private List<int> _triangles = new List<int>();
     private List<Vector2> _uvs = new List<Vector2>();
 
+<<<<<<< HEAD
     /// <summary>
     /// 图块贴图的长和宽
     /// </summary>
+=======
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     public float _textureOffset = 1 / 16f;
 
     private Mesh _mesh;
 
     private Block[,,] _map;
+<<<<<<< HEAD
     public static int length = 16;
     public static int width = 16;
     public static int height = 16;
@@ -49,12 +56,22 @@ public class Chunk3Texture : MonoBehaviour
 
             CreateMap();
         }
+=======
+    public int length = 10;
+    public int width = 10;
+    public int height = 10;
+
+    void Start()
+    {
+        CalculateMap();
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     }
 
     /// <summary>
     /// 预处理地形的函数
     /// 通过不同的算法产生地形数据
     /// </summary>
+<<<<<<< HEAD
     private void CreateMap()
     {
         Vector3 offset = new Vector3(Random.value * 1000000, Random.value * 1000000, Random.value * 1000000);
@@ -83,6 +100,32 @@ public class Chunk3Texture : MonoBehaviour
     }
 
     private IEnumerator CalculateMesh()
+=======
+    private void CalculateMap()
+    {
+        _mesh = new Mesh();
+        _mesh.name = "Chunck";
+
+        _map = new Block[length, height, width];
+        for (int x = 0; x < length; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int z = 0; z < width; z++)
+                {
+                    //if (y == height - 1)
+                    //    _map[x, y, z] = BlockMap.GetBlock("Grass");
+                    //else
+                    //    _map[x, y, z] = BlockMap.GetBlock("Dirt");
+                    _map[x, y, z] = BlockMap.GetBlock("Test");
+                }
+            }
+        }
+        CalculateMesh();
+    }
+
+    private void CalculateMesh()
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     {
         for (int x = 0; x < length; x++)
         {
@@ -106,6 +149,7 @@ public class Chunk3Texture : MonoBehaviour
         _mesh.RecalculateNormals();
         GetComponent<MeshCollider>().sharedMesh = _mesh;
         GetComponent<MeshFilter>().mesh = _mesh;
+<<<<<<< HEAD
 
         yield return null;
         _working = false;
@@ -129,6 +173,11 @@ public class Chunk3Texture : MonoBehaviour
     /// 四周方向连续
     /////////////////////////////////////////////////////////////
 
+=======
+    }
+
+    #region 创建立方体
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     private void AddCube(int x, int y, int z)
     {
         if (IsBlockTransparent(x, y, z - 1))
@@ -152,12 +201,21 @@ public class Chunk3Texture : MonoBehaviour
 
     private void AddCubeFront(int x, int y, int z)
     {
+<<<<<<< HEAD
         _triangles.Add(0 + _vertices.Count);
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
         _triangles.Add(0 + _vertices.Count);
+=======
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
 
         _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, -0.5f + z));
@@ -165,15 +223,27 @@ public class Chunk3Texture : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, -0.5f + z));
 
         Block block = _map[x, y, z];
+<<<<<<< HEAD
         Vector2 orgUv = new Vector2(block.texture_u_fb * _textureOffset, block.texture_v_fb * _textureOffset);
         _uvs.Add(orgUv + new Vector2(_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, 0) + new Vector2(-_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
         _uvs.Add(orgUv + new Vector2(0, _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+=======
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset,
+            block.texture_v_fb * _textureOffset) + new Vector2(_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset,
+            block.texture_v_fb * _textureOffset) + new Vector2(-_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset,
+            block.texture_v_fb * _textureOffset + _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset,
+            block.texture_v_fb * _textureOffset + _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     }
 
     private void AddCubeBack(int x, int y, int z)
     {
+<<<<<<< HEAD
         _triangles.Add(0 + _vertices.Count);
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
@@ -192,10 +262,34 @@ public class Chunk3Texture : MonoBehaviour
         _uvs.Add(orgUv + new Vector2(_textureOffset, 0) + new Vector2(-_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
         _uvs.Add(orgUv + new Vector2(0, _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+=======
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+
+        _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, 0.5f + z));
+        _vertices.Add(new Vector3(0.5f + x, -0.5f + y, 0.5f + z));
+        _vertices.Add(new Vector3(0.5f + x, 0.5f + y, 0.5f + z));
+        _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset,
+            block.texture_v_fb * _textureOffset) + new Vector2(-_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset,
+            block.texture_v_fb * _textureOffset) + new Vector2(_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset,
+            block.texture_v_fb * _textureOffset + _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_fb * _textureOffset + _textureOffset,
+            block.texture_v_fb * _textureOffset + _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     }
 
     private void AddCubeLeft(int x, int y, int z)
     {
+<<<<<<< HEAD
         _triangles.Add(0 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
@@ -214,16 +308,48 @@ public class Chunk3Texture : MonoBehaviour
         _uvs.Add(orgUv + new Vector2(0, _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, 0) + new Vector2(-_shrinkSize, _shrinkSize));
+=======
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+
+        _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, 0.5f + z));
+        _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, -0.5f + z));
+        _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, -0.5f + z));
+        _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
+
+        Block block = _map[x, y, z];
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset,
+            block.texture_v_lr * _textureOffset) + new Vector2(_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset,
+            block.texture_v_lr * _textureOffset) + new Vector2(-_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset,
+            block.texture_v_lr * _textureOffset + _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset,
+            block.texture_v_lr * _textureOffset + _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     }
 
     private void AddCubeRight(int x, int y, int z)
     {
+<<<<<<< HEAD
         _triangles.Add(0 + _vertices.Count);
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
         _triangles.Add(0 + _vertices.Count);
+=======
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
 
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, 0.5f + z));
@@ -231,21 +357,41 @@ public class Chunk3Texture : MonoBehaviour
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, -0.5f + z));
 
         Block block = _map[x, y, z];
+<<<<<<< HEAD
         Vector2 orgUv = new Vector2(block.texture_u_lr * _textureOffset, block.texture_v_lr * _textureOffset);
         _uvs.Add(orgUv + new Vector2(_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, 0) + new Vector2(-_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
         _uvs.Add(orgUv + new Vector2(0, _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+=======
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset,
+            block.texture_v_lr * _textureOffset) + new Vector2(_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset,
+            block.texture_v_lr * _textureOffset) + new Vector2(-_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset + _textureOffset,
+            block.texture_v_lr * _textureOffset + _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_lr * _textureOffset,
+            block.texture_v_lr * _textureOffset + _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     }
 
     private void AddCubeTop(int x, int y, int z)
     {
+<<<<<<< HEAD
         _triangles.Add(0 + _vertices.Count);
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
         _triangles.Add(0 + _vertices.Count);
+=======
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
 
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, 0.5f + y, -0.5f + z));
@@ -253,21 +399,41 @@ public class Chunk3Texture : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, 0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
+<<<<<<< HEAD
         Vector2 orgUv = new Vector2(block.texture_u_top * _textureOffset, block.texture_v_top * _textureOffset);
         _uvs.Add(orgUv + new Vector2(_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, 0) + new Vector2(-_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
         _uvs.Add(orgUv + new Vector2(0, _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+=======
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset,
+            block.texture_v_top * _textureOffset) + new Vector2(_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset + _textureOffset,
+            block.texture_v_top * _textureOffset) + new Vector2(-_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset + _textureOffset,
+            block.texture_v_top * _textureOffset + _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_top * _textureOffset,
+            block.texture_v_top * _textureOffset + _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     }
 
     private void AddCubeBottom(int x, int y, int z)
     {
+<<<<<<< HEAD
         _triangles.Add(3 + _vertices.Count);
         _triangles.Add(0 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
         _triangles.Add(1 + _vertices.Count);
         _triangles.Add(2 + _vertices.Count);
         _triangles.Add(3 + _vertices.Count);
+=======
+        _triangles.Add(1 + _vertices.Count);
+        _triangles.Add(2 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(3 + _vertices.Count);
+        _triangles.Add(0 + _vertices.Count);
+        _triangles.Add(1 + _vertices.Count);
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
 
         _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, -0.5f + z));
         _vertices.Add(new Vector3(0.5f + x, -0.5f + y, -0.5f + z));
@@ -275,11 +441,22 @@ public class Chunk3Texture : MonoBehaviour
         _vertices.Add(new Vector3(-0.5f + x, -0.5f + y, 0.5f + z));
 
         Block block = _map[x, y, z];
+<<<<<<< HEAD
         Vector2 orgUv = new Vector2(block.texture_u_bottom * _textureOffset, block.texture_v_bottom * _textureOffset);
         _uvs.Add(orgUv + new Vector2(_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, 0) + new Vector2(-_shrinkSize, _shrinkSize));
         _uvs.Add(orgUv + new Vector2(_textureOffset, _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
         _uvs.Add(orgUv + new Vector2(0, _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+=======
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset,
+            block.texture_v_bottom * _textureOffset) + new Vector2(_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset + _textureOffset,
+            block.texture_v_bottom * _textureOffset) + new Vector2(-_shrinkSize, _shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset + _textureOffset,
+            block.texture_v_bottom * _textureOffset + _textureOffset) + new Vector2(-_shrinkSize, -_shrinkSize));
+        _uvs.Add(new Vector2(block.texture_u_bottom * _textureOffset,
+            block.texture_v_bottom * _textureOffset + _textureOffset) + new Vector2(_shrinkSize, -_shrinkSize));
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
     }
     #endregion
 
@@ -300,6 +477,7 @@ public class Chunk3Texture : MonoBehaviour
 
         return false;
     }
+<<<<<<< HEAD
 
     public static Chunk3Texture GetChunk(int x, int y, int z)
     {
@@ -320,4 +498,6 @@ public class Chunk3Texture : MonoBehaviour
         }
         return null;
     }
+=======
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
 }

@@ -1,4 +1,8 @@
 sceneSetups:
+<<<<<<< HEAD
 - path: Assets/Test/Ctrl/Ctrl1.unity
+=======
+- path: Assets/Test/Chunk/Scene/Chunk3-SingleTexture.unity
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
   isLoaded: 1
   isActive: 1

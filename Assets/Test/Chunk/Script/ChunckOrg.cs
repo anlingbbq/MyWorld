@@ -50,7 +50,11 @@ public class ChunckOrg : MonoBehaviour {
             for (int y = 0; y < height; y++) {               
                 for (int z = 0; z < width; z++)
                 {                 
+<<<<<<< HEAD
                         map[x, y, z] = BlockMap.GetBlock("TestDir");                                              
+=======
+                        map[x, y, z] = BlockMap.GetBlock("Test");                                              
+>>>>>>> 60a8b662e8a6e8e38c4867095ebbbe3871e2b2f4
                 }
             }
         }
