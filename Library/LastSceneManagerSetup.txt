@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Test/Ctrl/Player.unity
+- path: Assets/Test/Ctrl/Ctrl1.unity
   isLoaded: 1
   isActive: 1
