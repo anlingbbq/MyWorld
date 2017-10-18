@@ -91,10 +91,10 @@
     <Compile Include="Assets\Test\Chunk\Script\Chunk3SingleTexture.cs" />
     <Compile Include="Assets\Test\Chunk\Script\Chunk3Texture.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\CamerRotate.cs" />
-    <Compile Include="Assets\Test\Ctrl\Script\Chunk4.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr3.cs" />
-    <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr3Texture2D.cs" />
+    <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr4Perlin.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\PlayerCtrl.cs" />
+    <Compile Include="Assets\Test\Perlin\Scripte\Chunk4Perlin.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinBase.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinCube.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinTexture2D.cs" />
