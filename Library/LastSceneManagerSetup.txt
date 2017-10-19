@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Test/Perlin/Scene/PerlinMap.unity
+- path: Assets/Test/Ctrl/Scene/Ctrl1.unity
   isLoaded: 1
   isActive: 1

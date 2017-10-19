@@ -186,6 +186,7 @@ public class Chunk2Map : MonoBehaviour
     /// <returns></returns>
     public bool IsBlockTransparent(int x, int y, int z)
     {
+        // 显示边界的面
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
             return true;
 

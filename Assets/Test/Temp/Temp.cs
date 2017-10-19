@@ -4,17 +4,21 @@ using UnityEngine;
 
 public class Temp : MonoBehaviour
 {
+    public static int seed;
+
     void Start()
     {
-        StartCoroutine(Test());
+        //Random.InitState(seed);
+        for (int i = 0; i < 10; i++)
+        {
+            StartCoroutine(Test());
+        }
     }
 
     private IEnumerator Test()
     {
-        for (int i = 0; i < 10; i++)
-        {
-            print(i);
-            yield return new WaitForSeconds(1);
-        }
+        Random.InitState(seed);
+        //print("x : " + Random.value + " y : " + Random.value + " z : " + Random.value);
+        yield return null;
     }
 }

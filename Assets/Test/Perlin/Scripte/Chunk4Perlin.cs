@@ -28,10 +28,11 @@ public class Chunk4Perlin : MonoBehaviour
     private static bool _working;
     private bool _ready;
 
+    public static int seed;
+
     void Start()
     {
         _chunks.Add(this);
-        _map = new Block[length, height, width];
     }
 
     void Update()
@@ -43,9 +44,10 @@ public class Chunk4Perlin : MonoBehaviour
 
             _mesh = new Mesh();
             _mesh.name = "Chunk";
+            _map = new Block[length, height, width];
             gameObject.name = "[" + transform.position.x / length
-                              + "," + transform.position.y / height
-                              + "," + transform.position.z / width + "]";
+                + "," + transform.position.y / height
+                + "," + transform.position.z / width + "]";
 
             CreateMap();
         }
@@ -57,29 +59,32 @@ public class Chunk4Perlin : MonoBehaviour
     /// </summary>
     private void CreateMap()
     {
-        Vector3 offset = new Vector3(Random.value * 1000000, Random.value * 1000000, Random.value * 1000000);
-        //Vector3 offset = new Vector3(0, 0, 0);
         for (int x = 0; x < length; x++)
         {
-            float noiseX = Mathf.Abs(x + transform.position.x + offset.x) / 20;
             for (int y = 0; y < height; y++)
             {
-                float noiseY = Mathf.Abs(y + transform.position.y + offset.y) / 20;
                 for (int z = 0; z < width; z++)
                 {
-                    float noiseZ = Mathf.Abs(z + transform.position.z + offset.z) / 20;
-                    float noiseValue = SimplexNoise.Noise.Generate(noiseX, noiseY, noiseZ);
-                    noiseValue += (8.0f - y) / 5;
-                    noiseValue /= (float)y / 2;
-
-                    if (noiseValue > 0.2f)
-                    {
-                        _map[x, y, z] = BlockMap.GetBlock("Dirt");
-                    }
+                    _map[x, y, z] = GetTheoreticalBlock(new Vector3(x, y, z) + transform.position);
                 }
             }
         }
+        //yield return null;
         StartCoroutine(CalculateMesh());
+    }
+
+    public Block GetTheoreticalBlock(Vector3 pos)
+    {
+        Random.InitState(seed);
+        Vector3 offset = new Vector3(Random.value * 100000, Random.value * 100000, Random.value * 100000);
+        float noiseX = Mathf.Abs(pos.x + offset.x) / 20;
+        float noiseY = Mathf.Abs(pos.y + offset.y) / 20;
+        float noiseZ = Mathf.Abs(pos.z + offset.z) / 20;
+        float noiseValue = SimplexNoise.Noise.Generate(noiseX, noiseY, noiseZ);
+        noiseValue += (8.0f - pos.y) / 5;
+        noiseValue /= pos.y / 4;
+
+        return noiseValue > 0.2f ? BlockMap.GetBlock("Dirt") : null;
     }
 
     private IEnumerator CalculateMesh()
@@ -291,14 +296,20 @@ public class Chunk4Perlin : MonoBehaviour
     /// <returns></returns>
     public bool IsBlockTransparent(int x, int y, int z)
     {
+        // 只显示矩形边界的面
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
-            return true;
+        {
+            //return true;
+            return (GetTheoreticalBlock(new Vector3(x, y, z) + transform.position) == null);
+        }
 
+        // 显示被去除的方块产生的面
         if (_map[x, y, z] == null)
             return true;
 
         return false;
     }
+
     public static Chunk4Perlin GetChunk(int x, int y, int z)
     {
         for (int i = 0; i < _chunks.Count; i++)

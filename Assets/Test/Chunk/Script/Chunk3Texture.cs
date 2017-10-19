@@ -42,9 +42,16 @@ public class Chunk3Texture : MonoBehaviour
                 for (int z = 0; z < width; z++)
                 {
                     if (y == height - 1)
-                        _map[x, y, z] = BlockMap.GetBlock("Grass");
+                    {
+                        if (Random.value > 0.7f)
+                            _map[x, y, z] = BlockMap.GetBlock("Grass");
+                        else
+                            _map[x, y, z] = null;
+                    }
                     else
+                    {
                         _map[x, y, z] = BlockMap.GetBlock("Dirt");
+                    }
                 }
             }
         }
@@ -230,9 +237,11 @@ public class Chunk3Texture : MonoBehaviour
     /// <returns></returns>
     public bool IsBlockTransparent(int x, int y, int z)
     {
+        // 只显示矩形边界的面
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
             return true;
 
+        // 显示被去除的方块产生的面
         if (_map[x, y, z] == null)
             return true;
 

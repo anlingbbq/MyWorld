@@ -17,20 +17,24 @@ public class ChunkMgr4Perlin : MonoBehaviour
     [SerializeField]
     private int _loadRange = 60;
 
+    public int _maxHigh = 8;
+
     private void Update()
     {
         int halfRange = _loadRange / 2;
         for (float x = _player.position.x - halfRange; x < _player.position.x + halfRange; x += Chunk.length)
         {
+            int posX = Mathf.FloorToInt(x / Chunk.length) * Chunk.length;
             for (float z = _player.position.z - halfRange; z < _player.position.z + halfRange; z += Chunk.width)
             {
-                int chunkX = Mathf.FloorToInt(x / Chunk.length) * Chunk.length;
-                int chunkZ = Mathf.FloorToInt(z / Chunk.width) * Chunk.width;
-
-                Chunk4Perlin chunk = Chunk4Perlin.GetChunk(chunkX, 0, chunkZ);
-                if (chunk == null)
+                int posZ = Mathf.FloorToInt(z / Chunk.width) * Chunk.width;
+                for (int y = 0; y < Chunk.height * _maxHigh; y += Chunk.height)
                 {
-                    Instantiate(_chunkPrefab, new Vector3(chunkX, 0, chunkZ), Quaternion.identity);
+                    Chunk4Perlin chunk = Chunk4Perlin.GetChunk(posX, y, posZ);
+                    if (chunk == null)
+                    {
+                        Instantiate(_chunkPrefab, new Vector3(posX, y, posZ), Quaternion.identity);
+                    }
                 }
             }
         }
