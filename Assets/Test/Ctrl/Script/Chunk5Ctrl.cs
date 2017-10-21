@@ -5,9 +5,9 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Chunk4Perlin : MonoBehaviour
+public class Chunk5Ctrl : MonoBehaviour
 {
-    private static List<Chunk4Perlin> _chunks = new List<Chunk4Perlin>();
+    private static List<Chunk5Ctrl> _chunks = new List<Chunk5Ctrl>();
 
     private List<Vector3> _vertices = new List<Vector3>();
     private List<int> _triangles = new List<int>();
@@ -65,7 +65,14 @@ public class Chunk4Perlin : MonoBehaviour
             {
                 for (int z = 0; z < width; z++)
                 {
-                    _map[x, y, z] = GetTheoreticalBlock(new Vector3(x, y, z) + transform.position);
+                    Block block = GetTheoreticalBlock(new Vector3(x, y, z) + transform.position);
+                    if (block != null)
+                    {
+                        if (GetTheoreticalBlock(new Vector3(x, y + 1, z) + transform.position) == null)
+                            _map[x, y, z] = BlockMap.GetBlock("Grass");
+                        else
+                            _map[x, y, z] = BlockMap.GetBlock("Dirt");
+                    }
                 }
             }
         }
@@ -89,6 +96,10 @@ public class Chunk4Perlin : MonoBehaviour
 
     private IEnumerator CalculateMesh()
     {
+        _vertices.Clear();
+        _triangles.Clear();
+        _uvs.Clear();
+
         for (int x = 0; x < length; x++)
         {
             for (int y = 0; y < height; y++)
@@ -310,7 +321,7 @@ public class Chunk4Perlin : MonoBehaviour
         return false;
     }
 
-    public static Chunk4Perlin GetChunk(int x, int y, int z)
+    public static Chunk5Ctrl GetChunk(int x, int y, int z)
     {
         for (int i = 0; i < _chunks.Count; i++)
         {
@@ -328,5 +339,22 @@ public class Chunk4Perlin : MonoBehaviour
             return _chunks[i];
         }
         return null;
+    }
+
+    public void SetChunk(Vector3 pos, Block block)
+    {
+        Vector3 localPos = pos - transform.position;
+        int blockX = Mathf.CeilToInt(localPos.x);
+        int blockY = Mathf.CeilToInt(localPos.y);
+        int blockZ = Mathf.CeilToInt(localPos.z);
+        _map[blockX, blockY, blockZ] = block;
+
+        ReBuildMesh();
+    }
+
+    public void ReBuildMesh()
+    {
+        _working = true;
+        StartCoroutine(CalculateMesh());
     }
 }

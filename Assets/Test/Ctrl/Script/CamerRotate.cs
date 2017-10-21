@@ -9,9 +9,10 @@ public class CamerRotate : MonoBehaviour
     private float _mouseX;
     private float _mouseY;
 
-    public const float _minRotateY = -50;
-    public const float _maxRotateY = 50;
+    public const float minRotateY = -50;
+    public const float maxRotateY = 50;
 
+    public float moveSpeed = 10;
     public float rotateSpeed = 10;
     public float mouseSpeedX = 4;
     public float mouseSpeedY = 4;
@@ -36,10 +37,23 @@ public class CamerRotate : MonoBehaviour
             _mouseX += Input.GetAxis("Mouse X") * mouseSpeedX;
             _mouseY += Input.GetAxis("Mouse Y") * -mouseSpeedY;
 
-            _mouseY = ClampAngle(_minRotateY, _maxRotateY, _mouseY);
+            _mouseY = ClampAngle(minRotateY, maxRotateY, _mouseY);
         }
         Quaternion rotation = Quaternion.Euler(_mouseY, _mouseX, 0.0f);
         _player.rotation = Quaternion.Lerp(_player.rotation, rotation, Time.deltaTime * rotateSpeed);
+
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            Vector3 pos = _player.transform.position;
+            pos.y += Time.deltaTime * moveSpeed;
+            _player.transform.position = pos;
+        }
+        else if (Input.GetKey(KeyCode.LeftControl))
+        {
+            Vector3 pos = _player.transform.position;
+            pos.y -= Time.deltaTime * moveSpeed;
+            _player.transform.position = pos;
+        }
     }
 
     private static float ClampAngle(float min, float max, float angle)

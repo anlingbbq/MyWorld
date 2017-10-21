@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Test/Ctrl/Scene/Ctrl1.unity
+- path: Assets/Test/Ctrl/Scene/CtrlChunk.unity
   isLoaded: 1
   isActive: 1
