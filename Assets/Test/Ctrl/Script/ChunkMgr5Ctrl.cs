@@ -10,6 +10,9 @@ public class ChunkMgr5Ctrl : MonoBehaviour
     [Label("图快预制体")]
     [SerializeField]
     private GameObject _chunkPrefab;
+    [SerializeField]
+    [Label("点击显示的高亮预制体")]
+    private GameObject _hightBlock;
     /// <summary>
     /// 加载范围以玩家为中心点的正方向边长
     /// </summary>
@@ -43,7 +46,7 @@ public class ChunkMgr5Ctrl : MonoBehaviour
                 }
             }
         }
-     
+
         BlockContrllre();
     }
 
@@ -52,24 +55,30 @@ public class ChunkMgr5Ctrl : MonoBehaviour
         RaycastHit hitInfo;
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hitInfo, 10f))
         {
-            if (Input.GetMouseButtonDown(1))
+           
+            
+            //Vector3 pos = hitInfo.point - hitInfo.normal / 2;
+            int hitX = Mathf.FloorToInt(hitInfo.point.x);
+            int hitY = Mathf.FloorToInt(hitInfo.point.y);
+            int hitZ = Mathf.FloorToInt(hitInfo.point.z);
+            Vector3 pos = new Vector3(hitX, hitY, hitZ);
+            _hightBlock.transform.position = new Vector3(
+                Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
+
+            if (Input.GetMouseButtonDown(0))
             {
-                int hitX = Mathf.FloorToInt(hitInfo.point.x);
-                int hitY = Mathf.FloorToInt(hitInfo.point.y);
-                int hitZ = Mathf.FloorToInt(hitInfo.point.z);
-                Vector3 blockPosition = new Vector3(hitX, hitY, hitZ);
                 Chunk5Ctrl chunk = Chunk5Ctrl.GetChunk(hitX, hitY, hitZ);
-                if (chunk != null)
-                    chunk.SetChunk(blockPosition, BlockMap.GetBlock("TNT"));
+                chunk.SetChunk(pos, null);
             }
-            else if (Input.GetMouseButton(0))
+            else if (Input.GetKeyDown(KeyCode.Q))
             {
-                int hitX = Mathf.FloorToInt(hitInfo.point.x);
-                int hitY = Mathf.FloorToInt(hitInfo.point.y);
-                int hitZ = Mathf.FloorToInt(hitInfo.point.z);
-                Vector3 blockPosition = new Vector3(hitX, hitY, hitZ);
-                Debug.DrawLine(Camera.main.transform.position, blockPosition);
+                Chunk5Ctrl chunk = Chunk5Ctrl.GetChunk(hitX, hitY, hitZ);
+                chunk.SetChunk(pos, BlockMap.GetBlock("TNT"));
             }
+        }
+        else
+        {
+            _hightBlock.transform.position = new Vector3(10000, 10000, 10000);
         }
     }
 }

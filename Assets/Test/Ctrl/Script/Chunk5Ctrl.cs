@@ -344,9 +344,11 @@ public class Chunk5Ctrl : MonoBehaviour
     public void SetChunk(Vector3 pos, Block block)
     {
         Vector3 localPos = pos - transform.position;
-        int blockX = Mathf.CeilToInt(localPos.x);
-        int blockY = Mathf.CeilToInt(localPos.y);
-        int blockZ = Mathf.CeilToInt(localPos.z);
+        int blockX = Mathf.FloorToInt(localPos.x);
+        int blockY = Mathf.FloorToInt(localPos.y);
+        int blockZ = Mathf.FloorToInt(localPos.z);
+        print("pos: " + pos.x + ", " + pos.y + ", " + pos.z);
+        print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
         _map[blockX, blockY, blockZ] = block;
 
         ReBuildMesh();
