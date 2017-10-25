@@ -55,24 +55,20 @@ public class ChunkMgr5Ctrl : MonoBehaviour
         RaycastHit hitInfo;
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hitInfo, 10f))
         {
-           
-            
-            //Vector3 pos = hitInfo.point - hitInfo.normal / 2;
-            int hitX = Mathf.FloorToInt(hitInfo.point.x);
-            int hitY = Mathf.FloorToInt(hitInfo.point.y);
-            int hitZ = Mathf.FloorToInt(hitInfo.point.z);
-            Vector3 pos = new Vector3(hitX, hitY, hitZ);
+            Vector3 pos = hitInfo.point - hitInfo.normal / 2;
+            //Vector3 pos = new Vector3(hitX, hitY, hitZ);
             _hightBlock.transform.position = new Vector3(
                 Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
 
             if (Input.GetMouseButtonDown(0))
             {
-                Chunk5Ctrl chunk = Chunk5Ctrl.GetChunk(hitX, hitY, hitZ);
+                Chunk5Ctrl chunk = Chunk5Ctrl.GetChunk(FloorToIntVector3(pos));
                 chunk.SetChunk(pos, null);
             }
             else if (Input.GetKeyDown(KeyCode.Q))
             {
-                Chunk5Ctrl chunk = Chunk5Ctrl.GetChunk(hitX, hitY, hitZ);
+                pos = hitInfo.point + hitInfo.normal / 2;
+                Chunk5Ctrl chunk = Chunk5Ctrl.GetChunk(FloorToIntVector3(pos));
                 chunk.SetChunk(pos, BlockMap.GetBlock("TNT"));
             }
         }
@@ -80,5 +76,10 @@ public class ChunkMgr5Ctrl : MonoBehaviour
         {
             _hightBlock.transform.position = new Vector3(10000, 10000, 10000);
         }
+    }
+
+    private Vector3 FloorToIntVector3(Vector3 pos)
+    {
+        return new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
     }
 }

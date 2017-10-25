@@ -42,9 +42,6 @@ public class Chunk5Ctrl : MonoBehaviour
             _ready = true;
             _working = true;
 
-            _mesh = new Mesh();
-            _mesh.name = "Chunk";
-            _map = new Block[length, height, width];
             gameObject.name = "[" + transform.position.x / length
                 + "," + transform.position.y / height
                 + "," + transform.position.z / width + "]";
@@ -59,6 +56,7 @@ public class Chunk5Ctrl : MonoBehaviour
     /// </summary>
     private void CreateMap()
     {
+        _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
         {
             for (int y = 0; y < height; y++)
@@ -96,6 +94,9 @@ public class Chunk5Ctrl : MonoBehaviour
 
     private IEnumerator CalculateMesh()
     {
+        _mesh = new Mesh();
+        _mesh.name = "Chunk";
+
         _vertices.Clear();
         _triangles.Clear();
         _uvs.Clear();
@@ -323,9 +324,28 @@ public class Chunk5Ctrl : MonoBehaviour
 
     public static Chunk5Ctrl GetChunk(int x, int y, int z)
     {
+        Vector3 pos = new Vector3(x, y, z);
         for (int i = 0; i < _chunks.Count; i++)
         {
-            Vector3 pos = new Vector3(x, y, z);
+            Vector3 chunkPos = _chunks[i].transform.position;
+            if (chunkPos.Equals(pos))
+            {
+                return _chunks[i];
+            }
+            if (pos.x < chunkPos.x || pos.y < chunkPos.y || pos.z < chunkPos.z
+                || pos.x >= chunkPos.x + length || pos.y >= chunkPos.y + height || pos.z >= chunkPos.z + width)
+            {
+                continue;
+            }
+            return _chunks[i];
+        }
+        return null;
+    }
+
+    public static Chunk5Ctrl GetChunk(Vector3 pos)
+    {
+        for (int i = 0; i < _chunks.Count; i++)
+        {
             Vector3 chunkPos = _chunks[i].transform.position;
             if (chunkPos.Equals(pos))
             {
@@ -347,8 +367,8 @@ public class Chunk5Ctrl : MonoBehaviour
         int blockX = Mathf.FloorToInt(localPos.x);
         int blockY = Mathf.FloorToInt(localPos.y);
         int blockZ = Mathf.FloorToInt(localPos.z);
-        print("pos: " + pos.x + ", " + pos.y + ", " + pos.z);
-        print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
+        //print("pos: " + pos.x + ", " + pos.y + ", " + pos.z);
+        //print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
         _map[blockX, blockY, blockZ] = block;
 
         ReBuildMesh();

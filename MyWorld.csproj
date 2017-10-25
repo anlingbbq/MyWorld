@@ -94,6 +94,7 @@
     <Compile Include="Assets\Test\Ctrl\Script\Chunk5Ctrl.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr4Perlin.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr5Ctrl.cs" />
+    <Compile Include="Assets\Test\Ctrl\Script\FlyCamera.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\PlayerCtrl.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\Chunk4Perlin.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinBase.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="Assets\ThreePart\Physics Platformer Kit\Scripts\Water.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Test\Ctrl\Shader\Tk_MineCraft.shader" />
     <None Include="Assets\ThreePart\Physics Platformer Kit\Read me 2.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
