@@ -98,6 +98,7 @@
     <Compile Include="Assets\Test\Ctrl\Script\ChunkMgr6Load.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\FlyCamera.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\PlayerCtrl.cs" />
+    <Compile Include="Assets\Test\Ctrl\Script\PlayerInventory.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\Chunk4Perlin.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinBase.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinCube.cs" />

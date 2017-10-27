@@ -1,6 +1,9 @@
-﻿public class Block
+﻿using UnityEngine;
+
+public class Block
 {
     public string name;
+    public Texture texItem;
 
     // 前后的贴图
     public int texture_u_fb;
@@ -61,5 +64,10 @@
         texture_v_top = ttv;
         texture_u_bottom = tbu;
         texture_v_bottom = tbv;
+    }
+
+    public void SetTexture(Texture2D tex)
+    {
+        texItem = tex;
     }
 }

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class BlockMap : MonoBehaviour
 {
+    /// <summary>
+    /// 保存所有图块
+    /// </summary>
     private static Dictionary<string, Block> _blockDict = new Dictionary<string, Block>();
 
     private void Awake()
