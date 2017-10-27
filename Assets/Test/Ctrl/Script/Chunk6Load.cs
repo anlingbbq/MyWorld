@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Chunk : MonoBehaviour
+public class Chunk6Load : MonoBehaviour
 {
     // 单个chunk的模型数据
     private List<Vector3> _vertices = new List<Vector3>();
@@ -337,7 +337,7 @@ public class Chunk : MonoBehaviour
 
     public void ReBuildMesh()
     {
-        working = true;
+        working= true;
         StartCoroutine(CalculateMesh());
     }
 
