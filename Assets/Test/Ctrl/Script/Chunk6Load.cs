@@ -36,6 +36,14 @@ public class Chunk6Load : MonoBehaviour
 
     public static int seed;
 
+    // 周围的图块
+    private Chunk6Load _topChunk;
+    private Chunk6Load _bottomChunk;
+    private Chunk6Load _rightChunk;
+    private Chunk6Load _leftChunk;
+    private Chunk6Load _frontChunk;
+    private Chunk6Load _backChunk;
+
     public void Init(int chunkX, int chunkY, int chunkZ)
     {
         gameObject.name = "[" + chunkX + "," + chunkY + "," + chunkZ + "]";
@@ -126,6 +134,46 @@ public class Chunk6Load : MonoBehaviour
         yield return null;
         working = false;
         ready = true;
+    }
+
+    private bool _rebuildWorking;
+    private IEnumerator ReCalculateMesh()
+    {
+        _rebuildWorking = true;
+
+        _mesh = new Mesh();
+        _mesh.name = "Chunk";
+
+        _vertices.Clear();
+        _triangles.Clear();
+        _uvs.Clear();
+
+        for (int x = 0; x < length; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int z = 0; z < width; z++)
+                {
+                    if (_map[x, y, z] != null)
+                    {
+                        AddCube(x, y, z);
+                    }
+                }
+            }
+        }
+
+        _mesh.vertices = _vertices.ToArray();
+        _mesh.triangles = _triangles.ToArray();
+        _mesh.uv = _uvs.ToArray();
+
+        _mesh.RecalculateBounds();
+        _mesh.RecalculateNormals();
+        GetComponent<MeshCollider>().sharedMesh = _mesh;
+        GetComponent<MeshFilter>().mesh = _mesh;
+
+        yield return null;
+        ready = true;
+        _rebuildWorking = false;
     }
 
     #region 创建立方体
@@ -306,7 +354,7 @@ public class Chunk6Load : MonoBehaviour
     /// <param name="y"></param>
     /// <param name="z"></param>
     /// <returns></returns>
-    public bool IsBlockTransparent(int x, int y, int z)
+    private bool IsBlockTransparent(int x, int y, int z)
     {
         // 只显示矩形边界的面
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
@@ -322,6 +370,91 @@ public class Chunk6Load : MonoBehaviour
         return false;
     }
 
+    private bool _generateMap;
+    private bool ReBuildIsBlockTransparent(int x, int y, int z)
+    {
+        // 右边
+        if (x >= length)
+        {
+            if (_rightChunk == null)
+                _rightChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
+            if (_rightChunk != this && _rightChunk != null && _rightChunk._generateMap)
+                return _rightChunk.GetBlock(x, y, z) != null;
+
+            return true;
+        }
+
+        // 左边
+        if (x < 0)
+        {
+            if (_leftChunk == null)
+                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
+            if (_leftChunk != this && _leftChunk != null && _leftChunk._generateMap)
+                return _leftChunk.GetBlock(x, y, z) != null;
+
+            return true;
+        }
+
+        // 前面
+        if (z < 0)
+        {
+            if (_frontChunk == null)
+                _frontChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
+            if (_frontChunk != this && _frontChunk != null && _frontChunk._generateMap)
+                return _frontChunk.GetBlock(x, y, z) != null;
+
+            return true;
+        }
+
+        // 后面
+        if (z >= width)
+        {
+            if (_backChunk == null)
+                _backChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
+            if (_backChunk != this && _backChunk != null && _backChunk._generateMap)
+                return _backChunk.GetBlock(x, y, z) != null;
+
+            return true;
+        }
+
+        // 上面
+        if (y >= height)
+        {
+            if (_topChunk == null)
+                _topChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
+            if (_topChunk != this && _topChunk != null && _topChunk._generateMap)
+                return _topChunk.GetBlock(x, y, z) != null;
+
+            return true;
+        }
+
+        // 下面
+        if (y < 0)
+        {
+            if (_bottomChunk == null)
+                _bottomChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
+            if (_bottomChunk != this && _bottomChunk != null && _bottomChunk._generateMap)
+                return _bottomChunk.GetBlock(x, y, z) != null;
+
+            return true;
+        }
+
+        if (_map[x, y, z] == null)
+            return true;
+
+        return false;
+    }
+
+    public Block GetBlock(Vector3 pos)
+    {
+        return GetBlock(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
+    }
+
+    public Block GetBlock(int x, int y, int z)
+    {
+        return _map[x, y, z];
+    }
+
     public void SetBlock(Vector3 pos, Block block)
     {
         Vector3 localPos = pos - transform.position;
@@ -332,7 +465,53 @@ public class Chunk6Load : MonoBehaviour
         //print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
         _map[blockX, blockY, blockZ] = block;
 
-        ReBuildMesh();
+        if (block != null)
+            return;
+
+        #region 补充未显示的面
+        // 右边
+        if (blockX >= length - 1)
+        {
+            if (_rightChunk == null)
+                _rightChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX + 1, blockY, blockZ);
+            ReBuildMesh();
+        }
+        // 左边
+        if (blockX <= 1)
+        {
+            if (_leftChunk == null)
+                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX - 1, blockY, blockZ);
+            ReBuildMesh();
+        }
+        // 前面
+        if (blockZ <= 1)
+        {
+            if (_leftChunk == null)
+                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
+            ReBuildMesh();
+        }
+        // 后面
+        if (blockZ >= width - 1)
+        {
+            if (_backChunk == null)
+                _backChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY, blockZ + 1);
+            ReBuildMesh();
+        }
+        // 上面
+        if (blockY >= height - 1)
+        {
+            if (_topChunk == null)
+                _topChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY + 1, blockZ);
+            ReBuildMesh();
+        }
+        // 下面
+        if (blockY <= 1)
+        {
+            if (_bottomChunk == null)
+                _bottomChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY - 1, blockZ);
+            ReBuildMesh();
+        }
+        #endregion
     }
 
     public void ReBuildMesh()

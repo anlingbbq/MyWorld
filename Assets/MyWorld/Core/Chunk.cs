@@ -128,6 +128,46 @@ public class Chunk : MonoBehaviour
         ready = true;
     }
 
+    private bool _rebuildWorking;
+    private IEnumerator ReCalculateMesh()
+    {
+        _rebuildWorking = true;
+
+        _mesh = new Mesh();
+        _mesh.name = "Chunk";
+
+        _vertices.Clear();
+        _triangles.Clear();
+        _uvs.Clear();
+
+        for (int x = 0; x < length; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int z = 0; z < width; z++)
+                {
+                    if (_map[x, y, z] != null)
+                    {
+                        AddCube(x, y, z);
+                    }
+                }
+            }
+        }
+
+        _mesh.vertices = _vertices.ToArray();
+        _mesh.triangles = _triangles.ToArray();
+        _mesh.uv = _uvs.ToArray();
+
+        _mesh.RecalculateBounds();
+        _mesh.RecalculateNormals();
+        GetComponent<MeshCollider>().sharedMesh = _mesh;
+        GetComponent<MeshFilter>().mesh = _mesh;
+
+        yield return null;
+        ready = true;
+        _rebuildWorking = false;
+    }
+
     #region 创建立方体
     /////////////////////////////////////////////////////////////
     /// 顶点坐标
@@ -325,13 +365,15 @@ public class Chunk : MonoBehaviour
     public void SetBlock(Vector3 pos, Block block)
     {
         Vector3 localPos = pos - transform.position;
+        //print("pos: " + pos.x + ", " + pos.y + ", " + pos.z);
+        //print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
+
         int blockX = Mathf.FloorToInt(localPos.x);
         int blockY = Mathf.FloorToInt(localPos.y);
         int blockZ = Mathf.FloorToInt(localPos.z);
-        //print("pos: " + pos.x + ", " + pos.y + ", " + pos.z);
-        //print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
-        _map[blockX, blockY, blockZ] = block;
 
+
+        _map[blockX, blockY, blockZ] = block;
         ReBuildMesh();
     }
 

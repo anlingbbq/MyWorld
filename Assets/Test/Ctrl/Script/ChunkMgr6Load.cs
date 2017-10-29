@@ -127,7 +127,7 @@ public class ChunkMgr6Load : MonoBehaviour
             _hightBlock.transform.position = new Vector3(
                 Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0))
             {
                 Chunk6Load chunk = GetChunkByWorldPos(FloorToIntVector3(pos));
                 chunk.SetBlock(pos, null);
