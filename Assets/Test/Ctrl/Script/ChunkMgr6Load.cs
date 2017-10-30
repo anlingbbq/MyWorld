@@ -129,13 +129,13 @@ public class ChunkMgr6Load : MonoBehaviour
 
             if (Input.GetMouseButton(0))
             {
-                Chunk6Load chunk = GetChunkByWorldPos(FloorToIntVector3(pos));
+                Chunk6Load chunk = GetChunkByWorldPos(DataUtil.FloorToInt(pos));
                 chunk.SetBlock(pos, null);
             }
             else if (Input.GetKeyDown(KeyCode.Q))
             {
                 pos = hitInfo.point + hitInfo.normal / 2;
-                Chunk6Load chunk = GetChunkByWorldPos(FloorToIntVector3(pos));
+                Chunk6Load chunk = GetChunkByWorldPos(DataUtil.FloorToInt(pos));
                 chunk.SetBlock(pos, BlockMap.GetBlock("TNT"));
             }
         }
@@ -183,10 +183,5 @@ public class ChunkMgr6Load : MonoBehaviour
                 return _chunks[i];
         }
         return null;
-    }
-
-    private Vector3 FloorToIntVector3(Vector3 pos)
-    {
-        return new Vector3(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
     }
 }

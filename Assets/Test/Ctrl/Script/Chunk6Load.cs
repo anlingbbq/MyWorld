@@ -137,10 +137,9 @@ public class Chunk6Load : MonoBehaviour
     }
 
     private bool _rebuildWorking;
-    private IEnumerator ReCalculateMesh()
+    private IEnumerator RebuildMesh()
     {
         _rebuildWorking = true;
-
         _mesh = new Mesh();
         _mesh.name = "Chunk";
 
@@ -156,7 +155,7 @@ public class Chunk6Load : MonoBehaviour
                 {
                     if (_map[x, y, z] != null)
                     {
-                        AddCube(x, y, z);
+                        RebuildCube(x, y, z);
                     }
                 }
             }
@@ -172,7 +171,6 @@ public class Chunk6Load : MonoBehaviour
         GetComponent<MeshFilter>().mesh = _mesh;
 
         yield return null;
-        ready = true;
         _rebuildWorking = false;
     }
 
@@ -193,6 +191,7 @@ public class Chunk6Load : MonoBehaviour
     /// 上下显示方向同观察的正面(z轴负方向显示的面)
     /// 四周方向连续
     /////////////////////////////////////////////////////////////
+    
     private void AddCube(int x, int y, int z)
     {
         if (IsBlockTransparent(x, y, z - 1))
@@ -206,6 +205,22 @@ public class Chunk6Load : MonoBehaviour
         if (IsBlockTransparent(x, y + 1, z))
             AddCubeTop(x, y, z);
         if (IsBlockTransparent(x, y - 1, z))
+            AddCubeBottom(x, y, z);
+    }
+
+    private void RebuildCube(int x, int y, int z)
+    {
+        if (IsRebuildBlockTransparent(x, y, z - 1))
+            AddCubeFront(x, y, z);
+        if (IsRebuildBlockTransparent(x, y, z + 1))
+            AddCubeBack(x, y, z);
+        if (IsRebuildBlockTransparent(x - 1, y, z))
+            AddCubeLeft(x, y, z);
+        if (IsRebuildBlockTransparent(x + 1, y, z))
+            AddCubeRight(x, y, z);
+        if (IsRebuildBlockTransparent(x, y + 1, z))
+            AddCubeTop(x, y, z);
+        if (IsRebuildBlockTransparent(x, y - 1, z))
             AddCubeBottom(x, y, z);
     }
 
@@ -353,7 +368,7 @@ public class Chunk6Load : MonoBehaviour
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="z"></param>
-    /// <returns></returns>
+    /// <returns>是否显示</returns>
     private bool IsBlockTransparent(int x, int y, int z)
     {
         // 只显示矩形边界的面
@@ -370,16 +385,24 @@ public class Chunk6Load : MonoBehaviour
         return false;
     }
 
-    private bool _generateMap;
-    private bool ReBuildIsBlockTransparent(int x, int y, int z)
+    /// <summary>
+    /// 修改图块后，显示的面
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns>是否显示</returns>
+    private bool IsRebuildBlockTransparent(int x, int y, int z)
     {
+        #region 检查周围是否有图块，没有则显示该面
+        Vector3 worldPos = DataUtil.FloorToInt(new Vector3(x, y, z) + transform.position);
         // 右边
         if (x >= length)
         {
             if (_rightChunk == null)
-                _rightChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
-            if (_rightChunk != this && _rightChunk != null && _rightChunk._generateMap)
-                return _rightChunk.GetBlock(x, y, z) != null;
+                _rightChunk = ChunkMgr6Load.GetChunkByChunkPos(chunkX + 1, chunkY, chunkZ);
+            if (_rightChunk != null && _rightChunk != this && _rightChunk.ready)
+                return _rightChunk.GetBlock(x, y, z) == null;
 
             return true;
         }
@@ -388,9 +411,9 @@ public class Chunk6Load : MonoBehaviour
         if (x < 0)
         {
             if (_leftChunk == null)
-                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
-            if (_leftChunk != this && _leftChunk != null && _leftChunk._generateMap)
-                return _leftChunk.GetBlock(x, y, z) != null;
+                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
+            if (_leftChunk != null && _leftChunk != this && _leftChunk.ready)
+                return _leftChunk.GetBlock(worldPos) == null;
 
             return true;
         }
@@ -399,9 +422,9 @@ public class Chunk6Load : MonoBehaviour
         if (z < 0)
         {
             if (_frontChunk == null)
-                _frontChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
-            if (_frontChunk != this && _frontChunk != null && _frontChunk._generateMap)
-                return _frontChunk.GetBlock(x, y, z) != null;
+                _frontChunk = ChunkMgr6Load.GetChunkByWorldPos(worldPos);
+            if (_frontChunk != null && _frontChunk != this && _frontChunk.ready)
+                return _frontChunk.GetBlock(worldPos) == null;
 
             return true;
         }
@@ -410,9 +433,9 @@ public class Chunk6Load : MonoBehaviour
         if (z >= width)
         {
             if (_backChunk == null)
-                _backChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
-            if (_backChunk != this && _backChunk != null && _backChunk._generateMap)
-                return _backChunk.GetBlock(x, y, z) != null;
+                _backChunk = ChunkMgr6Load.GetChunkByWorldPos(worldPos);
+            if (_backChunk != null && _backChunk != this && _backChunk.ready)
+                return _backChunk.GetBlock(worldPos) == null;
 
             return true;
         }
@@ -421,9 +444,9 @@ public class Chunk6Load : MonoBehaviour
         if (y >= height)
         {
             if (_topChunk == null)
-                _topChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
-            if (_topChunk != this && _topChunk != null && _topChunk._generateMap)
-                return _topChunk.GetBlock(x, y, z) != null;
+                _topChunk = ChunkMgr6Load.GetChunkByWorldPos(worldPos);
+            if (_topChunk != null && _topChunk != this && _topChunk.ready)
+                return _topChunk.GetBlock(worldPos) == null;
 
             return true;
         }
@@ -432,12 +455,13 @@ public class Chunk6Load : MonoBehaviour
         if (y < 0)
         {
             if (_bottomChunk == null)
-                _bottomChunk = ChunkMgr6Load.GetChunkByChunkPos(x, y, z);
-            if (_bottomChunk != this && _bottomChunk != null && _bottomChunk._generateMap)
-                return _bottomChunk.GetBlock(x, y, z) != null;
+                _bottomChunk = ChunkMgr6Load.GetChunkByWorldPos(worldPos);
+            if (_bottomChunk != null && _bottomChunk != this && _bottomChunk.ready)
+                return _bottomChunk.GetBlock(worldPos) == null;
 
             return true;
         }
+        #endregion
 
         if (_map[x, y, z] == null)
             return true;
@@ -445,16 +469,14 @@ public class Chunk6Load : MonoBehaviour
         return false;
     }
 
-    public Block GetBlock(Vector3 pos)
-    {
-        return GetBlock(Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
-    }
-
     public Block GetBlock(int x, int y, int z)
     {
+        if (x < 0 || y < 0 || z < 0)
+            return null;
+
         return _map[x, y, z];
     }
-
+    
     public void SetBlock(Vector3 pos, Block block)
     {
         Vector3 localPos = pos - transform.position;
@@ -465,59 +487,61 @@ public class Chunk6Load : MonoBehaviour
         //print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
         _map[blockX, blockY, blockZ] = block;
 
+        StartCoroutine(RebuildMesh());
         if (block != null)
             return;
 
-        #region 补充未显示的面
+        #region 重构相邻的图块，补充未显示的面
         // 右边
-        if (blockX >= length - 1)
+        if (blockX == length - 1)
         {
             if (_rightChunk == null)
                 _rightChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX + 1, blockY, blockZ);
-            ReBuildMesh();
+            //StartCoroutine(_rightChunk.RebuildMesh());
+            //Debug.Log("rihgt : " + _rightChunk.name);
         }
         // 左边
-        if (blockX <= 1)
+        if (blockX == 0)
         {
             if (_leftChunk == null)
-                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX - 1, blockY, blockZ);
-            ReBuildMesh();
+                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
+            StartCoroutine(_leftChunk.RebuildMesh());
+            //Debug.Log("left : " + _leftChunk.name);
         }
         // 前面
-        if (blockZ <= 1)
+        if (blockZ == 0)
         {
-            if (_leftChunk == null)
-                _leftChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
-            ReBuildMesh();
+            if (_frontChunk == null)
+                _frontChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
+            //StartCoroutine(_frontChunk.RebuildMesh());
+            //Debug.Log("front : " + _frontChunk.name);
         }
         // 后面
-        if (blockZ >= width - 1)
+        if (blockZ == width - 1)
         {
             if (_backChunk == null)
                 _backChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY, blockZ + 1);
-            ReBuildMesh();
+            //StartCoroutine(_backChunk.RebuildMesh());
+            //Debug.Log("back : " + _backChunk.name);
         }
         // 上面
-        if (blockY >= height - 1)
+        if (blockY == height - 1)
         {
             if (_topChunk == null)
                 _topChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY + 1, blockZ);
-            ReBuildMesh();
+
+            //StartCoroutine(_topChunk.RebuildMesh());
+            //Debug.Log("top : " + _topChunk.name);
         }
         // 下面
-        if (blockY <= 1)
+        if (blockY == 0)
         {
             if (_bottomChunk == null)
-                _bottomChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY - 1, blockZ);
-            ReBuildMesh();
+                _bottomChunk = ChunkMgr6Load.GetChunkByWorldPos(blockX, blockY - 1, blockZ);
+            //StartCoroutine(_bottomChunk.RebuildMesh());
+            //Debug.Log("bottom : " + _bottomChunk.name);
         }
         #endregion
-    }
-
-    public void ReBuildMesh()
-    {
-        working= true;
-        StartCoroutine(CalculateMesh());
     }
 
     public Vector3 GetChunkPos()

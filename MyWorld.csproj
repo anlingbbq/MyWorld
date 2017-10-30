@@ -82,6 +82,7 @@
     <Compile Include="Assets\MyWorld\Core\Block.cs" />
     <Compile Include="Assets\MyWorld\Core\BlockMap.cs" />
     <Compile Include="Assets\MyWorld\Core\Chunk.cs" />
+    <Compile Include="Assets\MyWorld\Core\DataUtil.cs" />
     <Compile Include="Assets\MyWorld\Core\SimplexNoiseGenerator.cs" />
     <Compile Include="Assets\Test\Chunk\Script\ChunckOrg.cs" />
     <Compile Include="Assets\Test\Chunk\Script\Chunk1Single.cs" />
