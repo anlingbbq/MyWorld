@@ -136,10 +136,8 @@ public class Chunk6Load : MonoBehaviour
         ready = true;
     }
 
-    private bool _rebuildWorking;
     private IEnumerator RebuildMesh()
     {
-        _rebuildWorking = true;
         _mesh = new Mesh();
         _mesh.name = "Chunk";
 
@@ -171,7 +169,6 @@ public class Chunk6Load : MonoBehaviour
         GetComponent<MeshFilter>().mesh = _mesh;
 
         yield return null;
-        _rebuildWorking = false;
     }
 
     #region 创建立方体
@@ -478,9 +475,9 @@ public class Chunk6Load : MonoBehaviour
     public void SetBlock(Vector3 pos, Block block)
     {
         Vector3 localPos = pos - transform.position;
-        int blockX = Mathf.FloorToInt(localPos.x);
-        int blockY = Mathf.FloorToInt(localPos.y);
-        int blockZ = Mathf.FloorToInt(localPos.z);
+        int blockX = Mathf.CeilToInt(localPos.x);
+        int blockY = Mathf.CeilToInt(localPos.y);
+        int blockZ = Mathf.CeilToInt(localPos.z);
         //print("pos: " + pos.x + ", " + pos.y + ", " + pos.z);
         //print("local pos: " + blockX + ", " + blockY + ", " + blockZ);
         _map[blockX, blockY, blockZ] = block;

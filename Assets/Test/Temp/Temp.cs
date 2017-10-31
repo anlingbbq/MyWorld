@@ -18,7 +18,7 @@ public class Temp : MonoBehaviour
     private IEnumerator Test()
     {
         Random.InitState(seed);
-        //print("x : " + Random.value + " y : " + Random.value + " z : " + Random.value);
+        print("x : " + Random.value + " y : " + Random.value + " z : " + Random.value);
         yield return null;
     }
 }

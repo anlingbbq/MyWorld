@@ -124,18 +124,17 @@ public class ChunkMgr6Load : MonoBehaviour
         {
             Vector3 pos = hitInfo.point - hitInfo.normal / 2;
             //Vector3 pos = new Vector3(hitX, hitY, hitZ);
-            _hightBlock.transform.position = new Vector3(
-                Mathf.FloorToInt(pos.x), Mathf.FloorToInt(pos.y), Mathf.FloorToInt(pos.z));
+            _hightBlock.transform.position = DataUtil.CeilToInt(pos);
 
             if (Input.GetMouseButton(0))
             {
-                Chunk6Load chunk = GetChunkByWorldPos(DataUtil.FloorToInt(pos));
+                Chunk6Load chunk = GetChunkByWorldPos(DataUtil.CeilToInt(pos));
                 chunk.SetBlock(pos, null);
             }
             else if (Input.GetKeyDown(KeyCode.Q))
             {
                 pos = hitInfo.point + hitInfo.normal / 2;
-                Chunk6Load chunk = GetChunkByWorldPos(DataUtil.FloorToInt(pos));
+                Chunk6Load chunk = GetChunkByWorldPos(DataUtil.CeilToInt(pos));
                 chunk.SetBlock(pos, BlockMap.GetBlock("TNT"));
             }
         }
