@@ -9,7 +9,7 @@ public class CamerRotate : MonoBehaviour
     private float _mouseX;
     private float _mouseY;
 
-    public const float minRotateY = -90;
+    public const float minRotateY = -120;
     public const float maxRotateY = 60;
 
     public float moveSpeed = 10;

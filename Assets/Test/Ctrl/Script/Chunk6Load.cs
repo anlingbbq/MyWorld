@@ -402,7 +402,7 @@ public class Chunk6Load : MonoBehaviour
             if (_rightChunk == null)
                 _rightChunk = ChunkMgr6Load.GetChunkByChunkPos(chunkX + 1, chunkY, chunkZ);
             if (_rightChunk != null && _rightChunk != this && _rightChunk.ready)
-                return _rightChunk.GetBlock(x, y, z) == null;
+                return _rightChunk.GetBlock(worldPos) == null;
 
             return true;
         }
@@ -469,12 +469,10 @@ public class Chunk6Load : MonoBehaviour
         return false;
     }
 
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlock(Vector3 worldPos)
     {
-        if (x < 0 || y < 0 || z < 0)
-            return null;
-
-        return _map[x, y, z];
+        Vector3 localPos = worldPos - transform.position;
+        return _map[Mathf.FloorToInt(localPos.x), Mathf.FloorToInt(localPos.y), Mathf.FloorToInt(localPos.z)];
     }
     
     public void SetBlock(Vector3 pos, Block block)
@@ -497,7 +495,7 @@ public class Chunk6Load : MonoBehaviour
         {
             if (_rightChunk == null)
                 _rightChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX + 1, blockY, blockZ);
-            //StartCoroutine(_rightChunk.RebuildMesh());
+            StartCoroutine(_rightChunk.RebuildMesh());
             //Debug.Log("rihgt : " + _rightChunk.name);
         }
         // 左边
@@ -513,7 +511,7 @@ public class Chunk6Load : MonoBehaviour
         {
             if (_frontChunk == null)
                 _frontChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
-            //StartCoroutine(_frontChunk.RebuildMesh());
+            StartCoroutine(_frontChunk.RebuildMesh());
             //Debug.Log("front : " + _frontChunk.name);
         }
         // 后面
@@ -521,7 +519,7 @@ public class Chunk6Load : MonoBehaviour
         {
             if (_backChunk == null)
                 _backChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY, blockZ + 1);
-            //StartCoroutine(_backChunk.RebuildMesh());
+            StartCoroutine(_backChunk.RebuildMesh());
             //Debug.Log("back : " + _backChunk.name);
         }
         // 上面
@@ -529,8 +527,7 @@ public class Chunk6Load : MonoBehaviour
         {
             if (_topChunk == null)
                 _topChunk = ChunkMgr6Load.GetChunkByChunkPos(blockX, blockY + 1, blockZ);
-
-            //StartCoroutine(_topChunk.RebuildMesh());
+            StartCoroutine(_topChunk.RebuildMesh());
             //Debug.Log("top : " + _topChunk.name);
         }
         // 下面
@@ -538,7 +535,7 @@ public class Chunk6Load : MonoBehaviour
         {
             if (_bottomChunk == null)
                 _bottomChunk = ChunkMgr6Load.GetChunkByWorldPos(blockX, blockY - 1, blockZ);
-            //StartCoroutine(_bottomChunk.RebuildMesh());
+            StartCoroutine(_bottomChunk.RebuildMesh());
             //Debug.Log("bottom : " + _bottomChunk.name);
         }
         #endregion
