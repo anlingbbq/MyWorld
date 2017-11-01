@@ -54,16 +54,11 @@ public class Chunk7Perlin : MonoBehaviour
         this.chunkZ = chunkZ;
     }
 
-    public void CreateMap()
-    {
-        CalculateMap();
-    }
-
     /// <summary>
     /// 预处理地形的函数
     /// 通过不同的算法产生地形数据
     /// </summary>
-    private void CalculateMap()
+    public void CalculateMap()
     {
         _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
@@ -103,6 +98,10 @@ public class Chunk7Perlin : MonoBehaviour
         return noiseValue > 0.2f ? BlockMap.GetBlock("Dirt") : null;
     }
 
+    /// <summary>
+    /// 构建网格
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator CalculateMesh()
     {
         _mesh = new Mesh();
@@ -140,6 +139,10 @@ public class Chunk7Perlin : MonoBehaviour
         ready = true;
     }
 
+    /// <summary>
+    /// 重建网格
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator RebuildMesh()
     {
         _mesh = new Mesh();
@@ -175,6 +178,91 @@ public class Chunk7Perlin : MonoBehaviour
         yield return null;
     }
 
+    /// <summary>
+    /// 加载周围的图块
+    /// </summary>
+    public void LoadAround()
+    {
+        // 左边
+        if (_leftChunk == null)
+        {
+            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+                new Vector3((chunkX - 1) * Chunk.length, chunkY * Chunk.height, chunkZ * Chunk.width)))
+            {
+                return;
+            }
+
+            _leftChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX - 1, chunkY, chunkZ));
+            if (_leftChunk == null)
+                ChunkMgr7Perlin.Instance().AddChunk(chunkX - 1, chunkY, chunkZ);
+        }
+        // 右边
+        if (_rightChunk == null)
+        {
+            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+               new Vector3((chunkX + 1) * Chunk.length, chunkY * Chunk.height, chunkZ * Chunk.width)))
+            {
+                return;
+            }
+
+            _rightChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX + 1, chunkY, chunkZ));
+            if (_rightChunk == null)
+                ChunkMgr7Perlin.Instance().AddChunk(chunkX + 1, chunkY, chunkZ);
+        }
+        // 前面
+        if (_frontChunk == null)
+        {
+            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+               new Vector3(chunkX * Chunk.length, chunkY * Chunk.height, (chunkZ - 1) * Chunk.width)))
+            {
+                return;
+            }
+
+            _frontChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ - 1));
+            if (_frontChunk == null)
+                ChunkMgr7Perlin.Instance().AddChunk(chunkX, chunkY, chunkZ - 1);
+        }
+        // 后面
+        if (_backChunk == null)
+        {
+            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+               new Vector3(chunkX * Chunk.length, chunkY * Chunk.height, (chunkZ + 1) * Chunk.width)))
+            {
+                return;
+            }
+
+            _backChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ + 1));
+            if (_backChunk == null)
+                ChunkMgr7Perlin.Instance().AddChunk(chunkX + 1, chunkY, chunkZ + 1);
+        }
+        // 上面
+        if (_topChunk == null)
+        {
+            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+               new Vector3(chunkX * Chunk.length, (chunkY + 1) * Chunk.height, chunkZ * Chunk.width)))
+            {
+                return;
+            }
+
+            _topChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY + 1, chunkZ));
+            if (_topChunk == null)
+                ChunkMgr7Perlin.Instance().AddChunk(chunkX, chunkY + 1, chunkZ);
+        }
+        // 下面
+        if (_bottomChunk == null)
+        {
+            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+               new Vector3(chunkX * Chunk.length, (chunkY - 1) * Chunk.height, chunkZ * Chunk.width)))
+            {
+                return;
+            }
+
+            _bottomChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY - 1, chunkZ));
+            if (_bottomChunk == null)
+                ChunkMgr7Perlin.Instance().AddChunk(chunkX, chunkY - 1, chunkZ);
+        }
+    }
+
     #region 创建立方体
     /////////////////////////////////////////////////////////////
     /// 顶点坐标
@@ -192,7 +280,7 @@ public class Chunk7Perlin : MonoBehaviour
     /// 上下显示方向同观察的正面(z轴负方向显示的面)
     /// 四周方向连续
     /////////////////////////////////////////////////////////////
-    
+
     private void AddCube(int x, int y, int z)
     {
         if (IsBlockTransparent(x, y, z - 1))
@@ -387,7 +475,7 @@ public class Chunk7Perlin : MonoBehaviour
     }
 
     /// <summary>
-    /// 修改图块后，显示的面
+    /// 控制重建网格后，显示的面
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -475,7 +563,7 @@ public class Chunk7Perlin : MonoBehaviour
         Vector3 localPos = worldPos - transform.position;
         return _map[Mathf.FloorToInt(localPos.x), Mathf.FloorToInt(localPos.y), Mathf.FloorToInt(localPos.z)];
     }
-    
+
     public void SetBlock(Vector3 pos, Block block)
     {
         Vector3 localPos = pos - transform.position;

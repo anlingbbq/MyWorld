@@ -20,7 +20,7 @@ public class ChunkMgr7Perlin : MonoBehaviour
     /// 加载范围以玩家为中心点的正方向边长的一半
     /// </summary>
     [SerializeField]
-    [Header("预加载图块范围")]
+    [Header("初始化图块范围")]
     [Range(0, 100)]
     private int _preloadRange = 60;
 
@@ -42,40 +42,71 @@ public class ChunkMgr7Perlin : MonoBehaviour
     private void Awake()
     {
         _instance = this;
+
+        LoadPlayerAround();
     }
 
     private void Update()
     {
-        if (_preload)
-        {
-            for (float x = player.position.x - _preloadRange; x < player.position.x + _preloadRange; x += Chunk.length)
-            {
-                int chunkX = Mathf.FloorToInt(x / Chunk.length);
-                for (float z = player.position.z - _preloadRange; z < player.position.z + _preloadRange; z += Chunk.width)
-                {
-                    int chunkZ = Mathf.FloorToInt(z / Chunk.width);
-                    for (float y = player.position.y - _preloadRange; y < player.position.y + _preloadRange; y += Chunk.height)
-                    {
-                        int chunkY = Mathf.FloorToInt(y / Chunk.height);
-                        if (GetChunkByChunkPos(chunkX, chunkY, chunkZ) == null)
-                        {
-                            GameObject go = Instantiate(_chunkPrefab, new Vector3(
-                                chunkX * Chunk.length, chunkY * Chunk.width, chunkZ * Chunk.height), Quaternion.identity);
-                            Chunk7Perlin chunk = go.GetComponent<Chunk7Perlin>();
-                            chunk.Init(chunkX, chunkY, chunkZ);
-                            _chunks.Add(chunk);
-                        }
-                    }
-                }
-            }
-
-            SpawnChunk();
-        }
-
+        SpawnChunk();
         DestoryChunk();
+        LoadChunkAround();
         BlockContrller();
     }
 
+    /// <summary>
+    /// 加载玩家周围的图块
+    /// </summary>
+    private void LoadPlayerAround()
+    {
+        if (!_preload)
+            return;
+
+        for (float x = player.position.x - _preloadRange; x < player.position.x + _preloadRange; x += Chunk.length)
+        {
+            int chunkX = Mathf.FloorToInt(x / Chunk.length);
+            for (float z = player.position.z - _preloadRange; z < player.position.z + _preloadRange; z += Chunk.width)
+            {
+                int chunkZ = Mathf.FloorToInt(z / Chunk.width);
+                for (float y = player.position.y - _preloadRange; y < player.position.y + _preloadRange; y += Chunk.height)
+                {
+                    int chunkY = Mathf.FloorToInt(y / Chunk.height);
+                    if (!HasChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ)))
+                    {
+                        AddChunk(chunkX, chunkY, chunkZ);
+                    }
+                }
+            }
+        }
+    }
+
+    public void AddChunk(int chunkX, int chunkY, int chunkZ)
+    {
+        GameObject go = Instantiate(_chunkPrefab, new Vector3(
+            chunkX * Chunk.length, chunkY * Chunk.width, chunkZ * Chunk.height), Quaternion.identity);
+        Chunk7Perlin chunk = go.GetComponent<Chunk7Perlin>();
+        chunk.Init(chunkX, chunkY, chunkZ);
+        _chunks.Add(chunk);
+    }
+
+    /// <summary>
+    /// 加载图块周围的图块
+    /// </summary>
+    private void LoadChunkAround()
+    {
+        if (!_preload)
+            return;
+
+        for (int i = 0; i < _chunks.Count; i++)
+        {
+            Chunk7Perlin chunk = _chunks[i];
+            chunk.LoadAround();
+        }
+    }
+
+    /// <summary>
+    /// 生产图块 创建地图
+    /// </summary>
     private void SpawnChunk()
     {
         if (Chunk7Perlin.working)
@@ -83,9 +114,8 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
         float lastDis = 99999999;
         Chunk7Perlin target = null;
-        for (int i = 0; i < _chunks.Count; i++)
+        foreach (Chunk7Perlin chunk in _chunks)
         {
-            Chunk7Perlin chunk = _chunks[i];
             float dis = Vector3.Distance(chunk.transform.position, player.position);
             if (dis < lastDis)
             {
@@ -99,17 +129,20 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
         if (target != null)
         {
-            target.CreateMap();
+            target.CalculateMap();
         }
     }
 
+    /// <summary>
+    /// 销毁图块
+    /// </summary>
     private void DestoryChunk()
     {
         for (int i = _chunks.Count - 1; i >= 0; i--)
         {
             Chunk7Perlin chunk = _chunks[i];
             float dis = Vector3.Distance(chunk.transform.position, player.position);
-            if (dis > (_preloadRange * 2 + Chunk.width))
+            if (dis > (_preloadRange + Chunk.width * 2))
             {
                 _chunks.Remove(chunk);
                 Destroy(chunk.gameObject);
@@ -117,6 +150,9 @@ public class ChunkMgr7Perlin : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 图块控制
+    /// </summary>
     private void BlockContrller()
     {
         RaycastHit hitInfo;
@@ -144,6 +180,16 @@ public class ChunkMgr7Perlin : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 是否在预加载范围内
+    /// </summary>
+    /// <param name="worldPos"></param>
+    /// <returns></returns>
+    public bool IsInPreLoadRange(Vector3 worldPos)
+    {
+        return Vector3.Distance(worldPos, player.position) <= _preloadRange;
+    }
+
     #region 获取图块
     public static Chunk7Perlin GetChunkByWorldPos(int x, int y, int z)
     {
@@ -153,18 +199,19 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
     public static Chunk7Perlin GetChunkByWorldPos(Vector3 pos)
     {
-        for (int i = 0; i < _chunks.Count; i++)
+        foreach (Chunk7Perlin chunk in _chunks)
         {
-            Vector3 chunkPos = _chunks[i].transform.position;
+            Vector3 chunkPos = chunk.transform.position;
             if (chunkPos.Equals(pos))
-                return _chunks[i];
+                return chunk;
 
             if (pos.x < chunkPos.x || pos.y < chunkPos.y || pos.z < chunkPos.z
                 || pos.x >= chunkPos.x + Chunk.length || pos.y >= chunkPos.y + Chunk.height || pos.z >= chunkPos.z + Chunk.width)
                 continue;
 
-            return _chunks[i];
+            return chunk;
         }
+
         return null;
     }
 
@@ -176,11 +223,11 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
     public static Chunk7Perlin GetChunkByChunkPos(Vector3 pos)
     {
-        for (int i = 0; i < _chunks.Count; i++)
+        foreach (Chunk7Perlin chunk in _chunks)
         {
-            Vector3 chunkPos = _chunks[i].GetChunkPos();
+            Vector3 chunkPos = chunk.GetChunkPos();
             if (chunkPos.Equals(pos))
-                return _chunks[i];
+                return chunk;
         }
         return null;
     }
@@ -192,9 +239,9 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
     public static bool HasChunkByWorldPos(Vector3 pos)
     {
-        for (int i = 0; i < _chunks.Count; i++)
+        foreach (Chunk7Perlin chunk in _chunks)
         {
-            Vector3 chunkPos = _chunks[i].transform.position;
+            Vector3 chunkPos = chunk.transform.position;
             if (chunkPos.Equals(pos))
                 return true;
 
@@ -203,6 +250,23 @@ public class ChunkMgr7Perlin : MonoBehaviour
                 continue;
 
             return true;
+        }
+        return false;
+    }
+
+    public static bool HasChunkByChunkPos(int x, int y, int z)
+    {
+        Vector3 pos = new Vector3(x, y, z);
+        return HasChunkByChunkPos(pos);
+    }
+
+    public static bool HasChunkByChunkPos(Vector3 pos)
+    {
+        foreach (Chunk7Perlin chunk in _chunks)
+        {
+            Vector3 chunkPos = chunk.GetChunkPos();
+            if (chunkPos.Equals(pos))
+                return true;
         }
         return false;
     }
