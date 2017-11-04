@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChunkMgr7Perlin : MonoBehaviour
+public class ChunkMgr7Thread : MonoBehaviour
 {
     [Label("玩家")]
     public Transform player;
@@ -17,10 +17,15 @@ public class ChunkMgr7Perlin : MonoBehaviour
     [Label("是否预加载图块")]
     private bool _preload = true;
     /// <summary>
-    /// 加载范围以玩家为中心点的正方向边长的一半
+    /// 初始化加载范围
     /// </summary>
     [SerializeField]
-    [Header("初始化图块范围")]
+    [Range(0, 100)]
+    private int _initLoadRange = 45;
+    /// <summary>
+    /// 预加载范围
+    /// </summary>
+    [SerializeField]
     [Range(0, 100)]
     private int _preloadRange = 60;
 
@@ -31,10 +36,10 @@ public class ChunkMgr7Perlin : MonoBehaviour
     /// 保存所有chunk
     /// </summary>
     [HideInInspector]
-    private static List<Chunk7Perlin> _chunks = new List<Chunk7Perlin>();
+    private static List<Chunk7Thread> _chunks = new List<Chunk7Thread>();
 
-    private static ChunkMgr7Perlin _instance;
-    public static ChunkMgr7Perlin Instance()
+    private static ChunkMgr7Thread _instance;
+    public static ChunkMgr7Thread Instance()
     {
         return _instance;
     }
@@ -62,13 +67,13 @@ public class ChunkMgr7Perlin : MonoBehaviour
         if (!_preload)
             return;
 
-        for (float x = player.position.x - _preloadRange; x < player.position.x + _preloadRange; x += Chunk.length)
+        for (float x = player.position.x - _initLoadRange; x < player.position.x + _initLoadRange; x += Chunk.length)
         {
             int chunkX = Mathf.FloorToInt(x / Chunk.length);
-            for (float z = player.position.z - _preloadRange; z < player.position.z + _preloadRange; z += Chunk.width)
+            for (float z = player.position.z - _initLoadRange; z < player.position.z + _initLoadRange; z += Chunk.width)
             {
                 int chunkZ = Mathf.FloorToInt(z / Chunk.width);
-                for (float y = player.position.y - _preloadRange; y < player.position.y + _preloadRange; y += Chunk.height)
+                for (float y = player.position.y - _initLoadRange; y < player.position.y + _initLoadRange; y += Chunk.height)
                 {
                     int chunkY = Mathf.FloorToInt(y / Chunk.height);
                     if (!HasChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ)))
@@ -84,7 +89,7 @@ public class ChunkMgr7Perlin : MonoBehaviour
     {
         GameObject go = Instantiate(_chunkPrefab, new Vector3(
             chunkX * Chunk.length, chunkY * Chunk.width, chunkZ * Chunk.height), Quaternion.identity);
-        Chunk7Perlin chunk = go.GetComponent<Chunk7Perlin>();
+        Chunk7Thread chunk = go.GetComponent<Chunk7Thread>();
         chunk.Init(chunkX, chunkY, chunkZ);
         _chunks.Add(chunk);
     }
@@ -99,7 +104,7 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
         for (int i = 0; i < _chunks.Count; i++)
         {
-            Chunk7Perlin chunk = _chunks[i];
+            Chunk7Thread chunk = _chunks[i];
             chunk.LoadAround();
         }
     }
@@ -109,12 +114,12 @@ public class ChunkMgr7Perlin : MonoBehaviour
     /// </summary>
     private void SpawnChunk()
     {
-        if (Chunk7Perlin.working)
+        if (Chunk7Thread.working)
             return;
 
         float lastDis = 99999999;
-        Chunk7Perlin target = null;
-        foreach (Chunk7Perlin chunk in _chunks)
+        Chunk7Thread target = null;
+        foreach (Chunk7Thread chunk in _chunks)
         {
             float dis = Vector3.Distance(chunk.transform.position, player.position);
             if (dis < lastDis)
@@ -129,7 +134,7 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
         if (target != null)
         {
-            target.CalculateMap();
+            StartCoroutine(target.CreateMap());
         }
     }
 
@@ -140,7 +145,7 @@ public class ChunkMgr7Perlin : MonoBehaviour
     {
         for (int i = _chunks.Count - 1; i >= 0; i--)
         {
-            Chunk7Perlin chunk = _chunks[i];
+            Chunk7Thread chunk = _chunks[i];
             float dis = Vector3.Distance(chunk.transform.position, player.position);
             if (dis > (_preloadRange + Chunk.width * 2))
             {
@@ -164,13 +169,13 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
             if (Input.GetMouseButton(0))
             {
-                Chunk7Perlin chunk = GetChunkByWorldPos(DataUtil.CeilToInt(pos));
+                Chunk7Thread chunk = GetChunkByWorldPos(DataUtil.CeilToInt(pos));
                 chunk.SetBlock(pos, null);
             }
             else if (Input.GetKeyDown(KeyCode.Q))
             {
                 pos = hitInfo.point + hitInfo.normal / 2;
-                Chunk7Perlin chunk = GetChunkByWorldPos(DataUtil.CeilToInt(pos));
+                Chunk7Thread chunk = GetChunkByWorldPos(DataUtil.CeilToInt(pos));
                 chunk.SetBlock(pos, BlockMap.GetBlock("TNT"));
             }
         }
@@ -191,15 +196,15 @@ public class ChunkMgr7Perlin : MonoBehaviour
     }
 
     #region 获取图块
-    public static Chunk7Perlin GetChunkByWorldPos(int x, int y, int z)
+    public static Chunk7Thread GetChunkByWorldPos(int x, int y, int z)
     {
         Vector3 pos = new Vector3(x, y, z);
         return GetChunkByWorldPos(pos);
     }
 
-    public static Chunk7Perlin GetChunkByWorldPos(Vector3 pos)
+    public static Chunk7Thread GetChunkByWorldPos(Vector3 pos)
     {
-        foreach (Chunk7Perlin chunk in _chunks)
+        foreach (Chunk7Thread chunk in _chunks)
         {
             Vector3 chunkPos = chunk.transform.position;
             if (chunkPos.Equals(pos))
@@ -215,15 +220,15 @@ public class ChunkMgr7Perlin : MonoBehaviour
         return null;
     }
 
-    public static Chunk7Perlin GetChunkByChunkPos(int x, int y, int z)
+    public static Chunk7Thread GetChunkByChunkPos(int x, int y, int z)
     {
         Vector3 pos = new Vector3(x, y, z);
         return GetChunkByChunkPos(pos);
     }
 
-    public static Chunk7Perlin GetChunkByChunkPos(Vector3 pos)
+    public static Chunk7Thread GetChunkByChunkPos(Vector3 pos)
     {
-        foreach (Chunk7Perlin chunk in _chunks)
+        foreach (Chunk7Thread chunk in _chunks)
         {
             Vector3 chunkPos = chunk.GetChunkPos();
             if (chunkPos.Equals(pos))
@@ -239,7 +244,7 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
     public static bool HasChunkByWorldPos(Vector3 pos)
     {
-        foreach (Chunk7Perlin chunk in _chunks)
+        foreach (Chunk7Thread chunk in _chunks)
         {
             Vector3 chunkPos = chunk.transform.position;
             if (chunkPos.Equals(pos))
@@ -262,7 +267,7 @@ public class ChunkMgr7Perlin : MonoBehaviour
 
     public static bool HasChunkByChunkPos(Vector3 pos)
     {
-        foreach (Chunk7Perlin chunk in _chunks)
+        foreach (Chunk7Thread chunk in _chunks)
         {
             Vector3 chunkPos = chunk.GetChunkPos();
             if (chunkPos.Equals(pos))

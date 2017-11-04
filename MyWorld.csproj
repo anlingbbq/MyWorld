@@ -136,8 +136,8 @@
     <Compile Include="Assets\Test\Ctrl\Script\PlayerCtrl.cs" />
     <Compile Include="Assets\Test\Ctrl\Script\PlayerInventory.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\Chunk4Perlin.cs" />
-    <Compile Include="Assets\Test\Perlin\Scripte\Chunk7Perlin.cs" />
-    <Compile Include="Assets\Test\Perlin\Scripte\ChunkMgr7Perlin.cs" />
+    <Compile Include="Assets\Test\Perlin\Scripte\Chunk7Thread.cs" />
+    <Compile Include="Assets\Test\Perlin\Scripte\ChunkMgr7Thread.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinBase.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinCube.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinTexture2D.cs" />
@@ -164,6 +164,7 @@
     <None Include="Assets\MyWorld\Core\LibNoise\COPYING.LESSER.txt" />
     <None Include="Assets\MyWorld\Core\LibNoise\COPYING.txt" />
     <None Include="Assets\Test\Ctrl\Shader\Tk_MineCraft.shader" />
+    <None Include="Assets\Test\Temp\OutLine.shader" />
     <None Include="Assets\ThreePart\Physics Platformer Kit\Read me 2.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Test/Perlin/Scene/PerlinMap2.unity
+- path: Assets/Test/Perlin/Scene/10-PerlinThread.unity
   isLoaded: 1
   isActive: 1

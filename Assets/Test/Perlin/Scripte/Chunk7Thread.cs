@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using LibNoise;
 using LibNoise.Generator;
@@ -7,7 +8,7 @@ using LibNoise.Generator;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Chunk7Perlin : MonoBehaviour
+public class Chunk7Thread : MonoBehaviour
 {
     // 单个chunk的模型数据
     private List<Vector3> _vertices = new List<Vector3>();
@@ -39,12 +40,18 @@ public class Chunk7Perlin : MonoBehaviour
     public static int seed;
 
     // 周围的图块
-    private Chunk7Perlin _topChunk;
-    private Chunk7Perlin _bottomChunk;
-    private Chunk7Perlin _rightChunk;
-    private Chunk7Perlin _leftChunk;
-    private Chunk7Perlin _frontChunk;
-    private Chunk7Perlin _backChunk;
+    private Chunk7Thread _topChunk;
+    private Chunk7Thread _bottomChunk;
+    private Chunk7Thread _rightChunk;
+    private Chunk7Thread _leftChunk;
+    private Chunk7Thread _frontChunk;
+    private Chunk7Thread _backChunk;
+
+    /// <summary>
+    /// 保存自身的位置
+    /// 在线程中使用
+    /// </summary>
+    private Vector3 _selfPos;
 
     public void Init(int chunkX, int chunkY, int chunkZ)
     {
@@ -52,25 +59,44 @@ public class Chunk7Perlin : MonoBehaviour
         this.chunkX = chunkX;
         this.chunkY = chunkY;
         this.chunkZ = chunkZ;
+
+        _map = new Block[length, height, width];
+        _selfPos = transform.position;
+    }
+
+    private static Thread _threadMap;
+
+    public IEnumerator CreateMap()
+    {
+        if (_threadMap == null || !_threadMap.IsAlive)
+        {
+            working = true;
+            _threadMap = new Thread(CalcuateMap);
+            _threadMap.Start();
+            while (_threadMap.IsAlive)
+                yield return null;
+
+            _threadMap = null;
+            StartCoroutine(CreateMesh());
+        }
     }
 
     /// <summary>
     /// 预处理地形的函数
     /// 通过不同的算法产生地形数据
     /// </summary>
-    public void CalculateMap()
+    private void CalcuateMap()
     {
-        _map = new Block[length, height, width];
         for (int x = 0; x < length; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 for (int z = 0; z < width; z++)
                 {
-                    Block block = GetTheoreticalBlock(new Vector3(x, y, z) + transform.position);
+                    Block block = GetTheoreticalBlock(new Vector3(x, y, z) + _selfPos);
                     if (block != null)
                     {
-                        if (GetTheoreticalBlock(new Vector3(x, y + 1, z) + transform.position) == null)
+                        if (GetTheoreticalBlock(new Vector3(x, y + 1, z) + _selfPos) == null)
                             _map[x, y, z] = BlockMap.GetBlock("Grass");
                         else
                             _map[x, y, z] = BlockMap.GetBlock("Dirt");
@@ -78,15 +104,14 @@ public class Chunk7Perlin : MonoBehaviour
                 }
             }
         }
-        //yield return null;
-        StartCoroutine(CalculateMesh());
     }
 
     Perlin noise = new Perlin(1.0f, 0.2f, 0.2f, 8, seed, QualityMode.High);
     public Block GetTheoreticalBlock(Vector3 pos)
     {
-        Random.InitState(seed);
-        Vector3 offset = new Vector3(Random.value * 100000, Random.value * 100000, Random.value * 100000);
+        System.Random random = new System.Random(seed);
+        Vector3 offset = new Vector3((float)random.NextDouble() * 100000, 
+            (float)random.NextDouble() * 100000, (float)random.NextDouble() * 100000);
         float noiseX = Mathf.Abs(pos.x + offset.x) / 20;
         float noiseY = Mathf.Abs(pos.y + offset.y) / 20;
         float noiseZ = Mathf.Abs(pos.z + offset.z) / 20;
@@ -102,11 +127,33 @@ public class Chunk7Perlin : MonoBehaviour
     /// 构建网格
     /// </summary>
     /// <returns></returns>
-    private IEnumerator CalculateMesh()
+    private IEnumerator CreateMesh()
     {
         _mesh = new Mesh();
         _mesh.name = "Chunk";
 
+        _threadMap = new Thread(CalculateMesh);
+        _threadMap.Start();
+        while (_threadMap.IsAlive)
+            yield return null;
+        _threadMap = null;
+
+        _mesh.vertices = _vertices.ToArray();
+        _mesh.triangles = _triangles.ToArray();
+        _mesh.uv = _uvs.ToArray();
+
+        _mesh.RecalculateBounds();
+        _mesh.RecalculateNormals();
+        GetComponent<MeshCollider>().sharedMesh = _mesh;
+        GetComponent<MeshFilter>().mesh = _mesh;
+
+        yield return null;
+        working = false;
+        ready = true;
+    }
+
+    private void CalculateMesh()
+    {
         _vertices.Clear();
         _triangles.Clear();
         _uvs.Clear();
@@ -124,19 +171,6 @@ public class Chunk7Perlin : MonoBehaviour
                 }
             }
         }
-
-        _mesh.vertices = _vertices.ToArray();
-        _mesh.triangles = _triangles.ToArray();
-        _mesh.uv = _uvs.ToArray();
-
-        _mesh.RecalculateBounds();
-        _mesh.RecalculateNormals();
-        GetComponent<MeshCollider>().sharedMesh = _mesh;
-        GetComponent<MeshFilter>().mesh = _mesh;
-
-        yield return null;
-        working = false;
-        ready = true;
     }
 
     /// <summary>
@@ -186,80 +220,80 @@ public class Chunk7Perlin : MonoBehaviour
         // 左边
         if (_leftChunk == null)
         {
-            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
                 new Vector3((chunkX - 1) * Chunk.length, chunkY * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _leftChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX - 1, chunkY, chunkZ));
+            _leftChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX - 1, chunkY, chunkZ));
             if (_leftChunk == null)
-                ChunkMgr7Perlin.Instance().AddChunk(chunkX - 1, chunkY, chunkZ);
+                ChunkMgr7Thread.Instance().AddChunk(chunkX - 1, chunkY, chunkZ);
         }
         // 右边
         if (_rightChunk == null)
         {
-            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
                new Vector3((chunkX + 1) * Chunk.length, chunkY * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _rightChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX + 1, chunkY, chunkZ));
+            _rightChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX + 1, chunkY, chunkZ));
             if (_rightChunk == null)
-                ChunkMgr7Perlin.Instance().AddChunk(chunkX + 1, chunkY, chunkZ);
+                ChunkMgr7Thread.Instance().AddChunk(chunkX + 1, chunkY, chunkZ);
         }
         // 前面
         if (_frontChunk == null)
         {
-            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, chunkY * Chunk.height, (chunkZ - 1) * Chunk.width)))
             {
                 return;
             }
 
-            _frontChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ - 1));
+            _frontChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ - 1));
             if (_frontChunk == null)
-                ChunkMgr7Perlin.Instance().AddChunk(chunkX, chunkY, chunkZ - 1);
+                ChunkMgr7Thread.Instance().AddChunk(chunkX, chunkY, chunkZ - 1);
         }
         // 后面
         if (_backChunk == null)
         {
-            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, chunkY * Chunk.height, (chunkZ + 1) * Chunk.width)))
             {
                 return;
             }
 
-            _backChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ + 1));
+            _backChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ + 1));
             if (_backChunk == null)
-                ChunkMgr7Perlin.Instance().AddChunk(chunkX + 1, chunkY, chunkZ + 1);
+                ChunkMgr7Thread.Instance().AddChunk(chunkX + 1, chunkY, chunkZ + 1);
         }
         // 上面
         if (_topChunk == null)
         {
-            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, (chunkY + 1) * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _topChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY + 1, chunkZ));
+            _topChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY + 1, chunkZ));
             if (_topChunk == null)
-                ChunkMgr7Perlin.Instance().AddChunk(chunkX, chunkY + 1, chunkZ);
+                ChunkMgr7Thread.Instance().AddChunk(chunkX, chunkY + 1, chunkZ);
         }
         // 下面
         if (_bottomChunk == null)
         {
-            if (!ChunkMgr7Perlin.Instance().IsInPreLoadRange(
+            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, (chunkY - 1) * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _bottomChunk = ChunkMgr7Perlin.GetChunkByChunkPos(new Vector3(chunkX, chunkY - 1, chunkZ));
+            _bottomChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY - 1, chunkZ));
             if (_bottomChunk == null)
-                ChunkMgr7Perlin.Instance().AddChunk(chunkX, chunkY - 1, chunkZ);
+                ChunkMgr7Thread.Instance().AddChunk(chunkX, chunkY - 1, chunkZ);
         }
     }
 
@@ -464,7 +498,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
         {
             //return true;
-            return (GetTheoreticalBlock(new Vector3(x, y, z) + transform.position) == null);
+            return (GetTheoreticalBlock(new Vector3(x, y, z) + _selfPos) == null);
         }
 
         // 显示被去除的方块产生的面
@@ -489,7 +523,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (x >= length)
         {
             if (_rightChunk == null)
-                _rightChunk = ChunkMgr7Perlin.GetChunkByChunkPos(chunkX + 1, chunkY, chunkZ);
+                _rightChunk = ChunkMgr7Thread.GetChunkByChunkPos(chunkX + 1, chunkY, chunkZ);
             if (_rightChunk != null && _rightChunk != this && _rightChunk.ready)
                 return _rightChunk.GetBlock(worldPos) == null;
 
@@ -500,7 +534,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (x < 0)
         {
             if (_leftChunk == null)
-                _leftChunk = ChunkMgr7Perlin.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
+                _leftChunk = ChunkMgr7Thread.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
             if (_leftChunk != null && _leftChunk != this && _leftChunk.ready)
                 return _leftChunk.GetBlock(worldPos) == null;
 
@@ -511,7 +545,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (z < 0)
         {
             if (_frontChunk == null)
-                _frontChunk = ChunkMgr7Perlin.GetChunkByWorldPos(worldPos);
+                _frontChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
             if (_frontChunk != null && _frontChunk != this && _frontChunk.ready)
                 return _frontChunk.GetBlock(worldPos) == null;
 
@@ -522,7 +556,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (z >= width)
         {
             if (_backChunk == null)
-                _backChunk = ChunkMgr7Perlin.GetChunkByWorldPos(worldPos);
+                _backChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
             if (_backChunk != null && _backChunk != this && _backChunk.ready)
                 return _backChunk.GetBlock(worldPos) == null;
 
@@ -533,7 +567,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (y >= height)
         {
             if (_topChunk == null)
-                _topChunk = ChunkMgr7Perlin.GetChunkByWorldPos(worldPos);
+                _topChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
             if (_topChunk != null && _topChunk != this && _topChunk.ready)
                 return _topChunk.GetBlock(worldPos) == null;
 
@@ -544,7 +578,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (y < 0)
         {
             if (_bottomChunk == null)
-                _bottomChunk = ChunkMgr7Perlin.GetChunkByWorldPos(worldPos);
+                _bottomChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
             if (_bottomChunk != null && _bottomChunk != this && _bottomChunk.ready)
                 return _bottomChunk.GetBlock(worldPos) == null;
 
@@ -583,7 +617,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (blockX == length - 1)
         {
             if (_rightChunk == null)
-                _rightChunk = ChunkMgr7Perlin.GetChunkByChunkPos(blockX + 1, blockY, blockZ);
+                _rightChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX + 1, blockY, blockZ);
             StartCoroutine(_rightChunk.RebuildMesh());
             //Debug.Log("rihgt : " + _rightChunk.name);
         }
@@ -591,7 +625,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (blockX == 0)
         {
             if (_leftChunk == null)
-                _leftChunk = ChunkMgr7Perlin.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
+                _leftChunk = ChunkMgr7Thread.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
             StartCoroutine(_leftChunk.RebuildMesh());
             //Debug.Log("left : " + _leftChunk.name);
         }
@@ -599,7 +633,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (blockZ == 0)
         {
             if (_frontChunk == null)
-                _frontChunk = ChunkMgr7Perlin.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
+                _frontChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
             StartCoroutine(_frontChunk.RebuildMesh());
             //Debug.Log("front : " + _frontChunk.name);
         }
@@ -607,7 +641,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (blockZ == width - 1)
         {
             if (_backChunk == null)
-                _backChunk = ChunkMgr7Perlin.GetChunkByChunkPos(blockX, blockY, blockZ + 1);
+                _backChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX, blockY, blockZ + 1);
             StartCoroutine(_backChunk.RebuildMesh());
             //Debug.Log("back : " + _backChunk.name);
         }
@@ -615,7 +649,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (blockY == height - 1)
         {
             if (_topChunk == null)
-                _topChunk = ChunkMgr7Perlin.GetChunkByChunkPos(blockX, blockY + 1, blockZ);
+                _topChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX, blockY + 1, blockZ);
             StartCoroutine(_topChunk.RebuildMesh());
             //Debug.Log("top : " + _topChunk.name);
         }
@@ -623,7 +657,7 @@ public class Chunk7Perlin : MonoBehaviour
         if (blockY == 0)
         {
             if (_bottomChunk == null)
-                _bottomChunk = ChunkMgr7Perlin.GetChunkByWorldPos(blockX, blockY - 1, blockZ);
+                _bottomChunk = ChunkMgr7Thread.GetChunkByWorldPos(blockX, blockY - 1, blockZ);
             StartCoroutine(_bottomChunk.RebuildMesh());
             //Debug.Log("bottom : " + _bottomChunk.name);
         }

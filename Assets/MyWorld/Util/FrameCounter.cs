@@ -11,9 +11,9 @@ public class FrameCounter : MonoBehaviour
     /// <summary>
     /// 计时自动关闭 0为不开启
     /// </summary>
-    [Label("计时自动关闭")]
-    public int autoCloseTime;
-    private float autoCloseCount;
+    [Label("统计平均帧数时长")]
+    public int meanFrameTime;
+    private float _meanFrameCount;
     /// <summary>
     /// fps累积
     /// </summary>
@@ -56,7 +56,7 @@ public class FrameCounter : MonoBehaviour
         _accum += (Time.timeScale / Time.deltaTime);
         ++_frames;
 
-        autoCloseCount += Time.deltaTime;
+        _meanFrameCount += Time.deltaTime;
 
         // 到达更新间隔
         if (_timeLeft <= 0.0f) 
@@ -66,7 +66,7 @@ public class FrameCounter : MonoBehaviour
             // 计算处理一帧需要的时间
             //_timeFrame = 1000.0f / _fps;
 
-            // 计算评价帧数
+            // 计算平均帧数
             _totalFps += _fps;
             _fpsCount++;
 
@@ -76,7 +76,7 @@ public class FrameCounter : MonoBehaviour
             _frames = 0;
         }
 
-        if (autoCloseTime != 0 && autoCloseCount >= autoCloseTime)
+        if (meanFrameTime != 0 && _meanFrameCount >= meanFrameTime)
         {
             print(">>>>>>>>>>>>>>> mean fps: " + _totalFps / _fpsCount);
             _start = false;
