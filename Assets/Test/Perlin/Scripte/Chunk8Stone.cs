@@ -8,7 +8,7 @@ using LibNoise.Generator;
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
-public class Chunk7Thread : MonoBehaviour
+public class Chunk8Stone : MonoBehaviour
 {
     // 单个chunk的模型数据
     private List<Vector3> _vertices = new List<Vector3>();
@@ -40,12 +40,12 @@ public class Chunk7Thread : MonoBehaviour
     public static int seed;
 
     // 周围的图块
-    private Chunk7Thread _topChunk;
-    private Chunk7Thread _bottomChunk;
-    private Chunk7Thread _rightChunk;
-    private Chunk7Thread _leftChunk;
-    private Chunk7Thread _frontChunk;
-    private Chunk7Thread _backChunk;
+    private Chunk8Stone _topChunk;
+    private Chunk8Stone _bottomChunk;
+    private Chunk8Stone _rightChunk;
+    private Chunk8Stone _leftChunk;
+    private Chunk8Stone _frontChunk;
+    private Chunk8Stone _backChunk;
 
     /// <summary>
     /// 保存自身的位置
@@ -96,10 +96,15 @@ public class Chunk7Thread : MonoBehaviour
                     Block block = GetTheoreticalBlock(new Vector3(x, y, z) + _selfPos);
                     if (block != null)
                     {
-                        if (GetTheoreticalBlock(new Vector3(x, y + 1, z) + _selfPos) == null)
+                        if (GetTheoreticalBlock(new Vector3(x, y + 1, z) + _selfPos) == null &&
+                            block == BlockMap.GetBlock("Dirt"))
+                        {
                             _map[x, y, z] = BlockMap.GetBlock("Grass");
+                        }
                         else
-                            _map[x, y, z] = BlockMap.GetBlock("Dirt");
+                        {
+                            _map[x, y, z] = block;
+                        }
                     }
                 }
             }
@@ -117,10 +122,18 @@ public class Chunk7Thread : MonoBehaviour
         float noiseZ = Mathf.Abs(pos.z + offset.z) / 20;
         //float noiseValue = SimplexNoise.Noise.Generate(noiseX, noiseY, noiseZ);
         double noiseValue = noise.GetValue(noiseX, noiseY, noiseZ);
-        noiseValue += (20.0f - pos.y) / 18;
-        noiseValue /= pos.y / 4;
+        noiseValue += (200.0f - pos.y) / 18;
+        noiseValue /= pos.y / 19.0f;
 
-        return noiseValue > 0.2f ? BlockMap.GetBlock("Dirt") : null;
+        if (noiseValue > 0.5f)
+        {
+            if (noiseValue > 0.6f)
+            {
+                return BlockMap.GetBlock("Stone");
+            }
+            return BlockMap.GetBlock("Dirt");
+        }
+        return null;
     }
 
     /// <summary>
@@ -220,80 +233,80 @@ public class Chunk7Thread : MonoBehaviour
         // 左边
         if (_leftChunk == null)
         {
-            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
+            if (!ChunkMgr8Stone.Instance().IsInPreLoadRange(
                 new Vector3((chunkX - 1) * Chunk.length, chunkY * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _leftChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX - 1, chunkY, chunkZ));
+            _leftChunk = ChunkMgr8Stone.GetChunkByChunkPos(new Vector3(chunkX - 1, chunkY, chunkZ));
             if (_leftChunk == null)
-                ChunkMgr7Thread.Instance().AddChunk(chunkX - 1, chunkY, chunkZ);
+                ChunkMgr8Stone.Instance().AddChunk(chunkX - 1, chunkY, chunkZ);
         }
         // 右边
         if (_rightChunk == null)
         {
-            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
+            if (!ChunkMgr8Stone.Instance().IsInPreLoadRange(
                new Vector3((chunkX + 1) * Chunk.length, chunkY * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _rightChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX + 1, chunkY, chunkZ));
+            _rightChunk = ChunkMgr8Stone.GetChunkByChunkPos(new Vector3(chunkX + 1, chunkY, chunkZ));
             if (_rightChunk == null)
-                ChunkMgr7Thread.Instance().AddChunk(chunkX + 1, chunkY, chunkZ);
+                ChunkMgr8Stone.Instance().AddChunk(chunkX + 1, chunkY, chunkZ);
         }
         // 前面
         if (_frontChunk == null)
         {
-            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
+            if (!ChunkMgr8Stone.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, chunkY * Chunk.height, (chunkZ - 1) * Chunk.width)))
             {
                 return;
             }
 
-            _frontChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ - 1));
+            _frontChunk = ChunkMgr8Stone.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ - 1));
             if (_frontChunk == null)
-                ChunkMgr7Thread.Instance().AddChunk(chunkX, chunkY, chunkZ - 1);
+                ChunkMgr8Stone.Instance().AddChunk(chunkX, chunkY, chunkZ - 1);
         }
         // 后面
         if (_backChunk == null)
         {
-            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
+            if (!ChunkMgr8Stone.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, chunkY * Chunk.height, (chunkZ + 1) * Chunk.width)))
             {
                 return;
             }
 
-            _backChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ + 1));
+            _backChunk = ChunkMgr8Stone.GetChunkByChunkPos(new Vector3(chunkX, chunkY, chunkZ + 1));
             if (_backChunk == null)
-                ChunkMgr7Thread.Instance().AddChunk(chunkX + 1, chunkY, chunkZ + 1);
+                ChunkMgr8Stone.Instance().AddChunk(chunkX + 1, chunkY, chunkZ + 1);
         }
         // 上面
         if (_topChunk == null)
         {
-            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
+            if (!ChunkMgr8Stone.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, (chunkY + 1) * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _topChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY + 1, chunkZ));
+            _topChunk = ChunkMgr8Stone.GetChunkByChunkPos(new Vector3(chunkX, chunkY + 1, chunkZ));
             if (_topChunk == null)
-                ChunkMgr7Thread.Instance().AddChunk(chunkX, chunkY + 1, chunkZ);
+                ChunkMgr8Stone.Instance().AddChunk(chunkX, chunkY + 1, chunkZ);
         }
         // 下面
         if (_bottomChunk == null)
         {
-            if (!ChunkMgr7Thread.Instance().IsInPreLoadRange(
+            if (!ChunkMgr8Stone.Instance().IsInPreLoadRange(
                new Vector3(chunkX * Chunk.length, (chunkY - 1) * Chunk.height, chunkZ * Chunk.width)))
             {
                 return;
             }
 
-            _bottomChunk = ChunkMgr7Thread.GetChunkByChunkPos(new Vector3(chunkX, chunkY - 1, chunkZ));
+            _bottomChunk = ChunkMgr8Stone.GetChunkByChunkPos(new Vector3(chunkX, chunkY - 1, chunkZ));
             if (_bottomChunk == null)
-                ChunkMgr7Thread.Instance().AddChunk(chunkX, chunkY - 1, chunkZ);
+                ChunkMgr8Stone.Instance().AddChunk(chunkX, chunkY - 1, chunkZ);
         }
     }
 
@@ -497,7 +510,6 @@ public class Chunk7Thread : MonoBehaviour
         // 只显示矩形边界的面
         if (x >= length || y >= height || z >= width || x < 0 || y < 0 || z < 0)
         {
-            //return true;
             return (GetTheoreticalBlock(new Vector3(x, y, z) + _selfPos) == null);
         }
 
@@ -523,7 +535,7 @@ public class Chunk7Thread : MonoBehaviour
         if (x >= length)
         {
             if (_rightChunk == null)
-                _rightChunk = ChunkMgr7Thread.GetChunkByChunkPos(chunkX + 1, chunkY, chunkZ);
+                _rightChunk = ChunkMgr8Stone.GetChunkByChunkPos(chunkX + 1, chunkY, chunkZ);
             if (_rightChunk != null && _rightChunk != this && _rightChunk.ready)
                 return _rightChunk.GetBlock(worldPos) == null;
 
@@ -534,7 +546,7 @@ public class Chunk7Thread : MonoBehaviour
         if (x < 0)
         {
             if (_leftChunk == null)
-                _leftChunk = ChunkMgr7Thread.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
+                _leftChunk = ChunkMgr8Stone.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
             if (_leftChunk != null && _leftChunk != this && _leftChunk.ready)
                 return _leftChunk.GetBlock(worldPos) == null;
 
@@ -545,7 +557,7 @@ public class Chunk7Thread : MonoBehaviour
         if (z < 0)
         {
             if (_frontChunk == null)
-                _frontChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
+                _frontChunk = ChunkMgr8Stone.GetChunkByWorldPos(worldPos);
             if (_frontChunk != null && _frontChunk != this && _frontChunk.ready)
                 return _frontChunk.GetBlock(worldPos) == null;
 
@@ -556,7 +568,7 @@ public class Chunk7Thread : MonoBehaviour
         if (z >= width)
         {
             if (_backChunk == null)
-                _backChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
+                _backChunk = ChunkMgr8Stone.GetChunkByWorldPos(worldPos);
             if (_backChunk != null && _backChunk != this && _backChunk.ready)
                 return _backChunk.GetBlock(worldPos) == null;
 
@@ -567,7 +579,7 @@ public class Chunk7Thread : MonoBehaviour
         if (y >= height)
         {
             if (_topChunk == null)
-                _topChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
+                _topChunk = ChunkMgr8Stone.GetChunkByWorldPos(worldPos);
             if (_topChunk != null && _topChunk != this && _topChunk.ready)
                 return _topChunk.GetBlock(worldPos) == null;
 
@@ -578,7 +590,7 @@ public class Chunk7Thread : MonoBehaviour
         if (y < 0)
         {
             if (_bottomChunk == null)
-                _bottomChunk = ChunkMgr7Thread.GetChunkByWorldPos(worldPos);
+                _bottomChunk = ChunkMgr8Stone.GetChunkByWorldPos(worldPos);
             if (_bottomChunk != null && _bottomChunk != this && _bottomChunk.ready)
                 return _bottomChunk.GetBlock(worldPos) == null;
 
@@ -617,7 +629,7 @@ public class Chunk7Thread : MonoBehaviour
         if (blockX == length - 1)
         {
             if (_rightChunk == null)
-                _rightChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX + 1, blockY, blockZ);
+                _rightChunk = ChunkMgr8Stone.GetChunkByChunkPos(blockX + 1, blockY, blockZ);
             StartCoroutine(_rightChunk.RebuildMesh());
             //Debug.Log("rihgt : " + _rightChunk.name);
         }
@@ -625,7 +637,7 @@ public class Chunk7Thread : MonoBehaviour
         if (blockX == 0)
         {
             if (_leftChunk == null)
-                _leftChunk = ChunkMgr7Thread.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
+                _leftChunk = ChunkMgr8Stone.GetChunkByChunkPos(chunkX - 1, chunkY, chunkZ);
             StartCoroutine(_leftChunk.RebuildMesh());
             //Debug.Log("left : " + _leftChunk.name);
         }
@@ -633,7 +645,7 @@ public class Chunk7Thread : MonoBehaviour
         if (blockZ == 0)
         {
             if (_frontChunk == null)
-                _frontChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
+                _frontChunk = ChunkMgr8Stone.GetChunkByChunkPos(blockX, blockY, blockZ - 1);
             StartCoroutine(_frontChunk.RebuildMesh());
             //Debug.Log("front : " + _frontChunk.name);
         }
@@ -641,7 +653,7 @@ public class Chunk7Thread : MonoBehaviour
         if (blockZ == width - 1)
         {
             if (_backChunk == null)
-                _backChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX, blockY, blockZ + 1);
+                _backChunk = ChunkMgr8Stone.GetChunkByChunkPos(blockX, blockY, blockZ + 1);
             StartCoroutine(_backChunk.RebuildMesh());
             //Debug.Log("back : " + _backChunk.name);
         }
@@ -649,7 +661,7 @@ public class Chunk7Thread : MonoBehaviour
         if (blockY == height - 1)
         {
             if (_topChunk == null)
-                _topChunk = ChunkMgr7Thread.GetChunkByChunkPos(blockX, blockY + 1, blockZ);
+                _topChunk = ChunkMgr8Stone.GetChunkByChunkPos(blockX, blockY + 1, blockZ);
             StartCoroutine(_topChunk.RebuildMesh());
             //Debug.Log("top : " + _topChunk.name);
         }
@@ -657,7 +669,7 @@ public class Chunk7Thread : MonoBehaviour
         if (blockY == 0)
         {
             if (_bottomChunk == null)
-                _bottomChunk = ChunkMgr7Thread.GetChunkByWorldPos(blockX, blockY - 1, blockZ);
+                _bottomChunk = ChunkMgr8Stone.GetChunkByWorldPos(blockX, blockY - 1, blockZ);
             StartCoroutine(_bottomChunk.RebuildMesh());
             //Debug.Log("bottom : " + _bottomChunk.name);
         }

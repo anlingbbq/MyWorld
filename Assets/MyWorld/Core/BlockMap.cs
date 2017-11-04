@@ -22,6 +22,9 @@ public class BlockMap : MonoBehaviour
         Block grass = new Block("Grass", 3, 15, 0, 15, 2, 15);
         AddBlock(grass);
 
+        Block stone = new Block("Stone", 0, 14, 0, 14, 0, 14);
+        AddBlock(stone);
+
         Block tnt = new Block("TNT", 8, 15, 8, 15, 8, 15);
         AddBlock(tnt);
 

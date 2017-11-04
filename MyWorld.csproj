@@ -137,7 +137,9 @@
     <Compile Include="Assets\Test\Ctrl\Script\PlayerInventory.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\Chunk4Perlin.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\Chunk7Thread.cs" />
+    <Compile Include="Assets\Test\Perlin\Scripte\Chunk8Stone.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\ChunkMgr7Thread.cs" />
+    <Compile Include="Assets\Test\Perlin\Scripte\ChunkMgr8Stone.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinBase.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinCube.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinTexture2D.cs" />
