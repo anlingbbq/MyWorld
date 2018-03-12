@@ -142,6 +142,7 @@
     <Compile Include="Assets\Test\Perlin\Scripte\ChunkMgr8Stone.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinBase.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinCube.cs" />
+    <Compile Include="Assets\Test\Perlin\Scripte\PerlinCubeTest.cs" />
     <Compile Include="Assets\Test\Perlin\Scripte\PerlinTexture2D.cs" />
     <Compile Include="Assets\Test\Temp\Temp.cs" />
     <Compile Include="Assets\ThreePart\Physics Platformer Kit\Misc\DemoTextFade.cs" />

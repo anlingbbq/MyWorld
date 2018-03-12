@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using LibNoise;
+using LibNoise.Generator;
+using UnityEngine;
 
 public class PerlinCube : MonoBehaviour
 {
